@@ -6,8 +6,8 @@ script:
 - echo "done"
 
 before_deploy:
-- openssl aes-256-cbc -K $encrypted_0031d8fb8ea0_key -iv 
-$encrypted_0031d8fb8ea0_iv -in .deploy/deploy_rsa.enc -out /tmp/deploy_rsa -d
+- "openssl aes-256-cbc -K $encrypted_0031d8fb8ea0_key -iv 
+$encrypted_0031d8fb8ea0_iv -in .deploy/deploy_rsa.enc -out /tmp/deploy_rsa -d"
 - eval "$(ssh-agent -s)"
 - chmod 600 /tmp/deploy_rsa
 - ssh-add /tmp/deploy_rsa
@@ -15,8 +15,8 @@ $encrypted_0031d8fb8ea0_iv -in .deploy/deploy_rsa.enc -out /tmp/deploy_rsa -d
 deploy:
   provider: script
   skip_cleanup: true
-  script: rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR 
-root@nick.bewegung.jetzt:/var/dib/wahlchecker/site
+  script: "rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR 
+root@nick.bewegung.jetzt:/var/dib/wahlchecker/site"
   on:
     branch: master
     condition: '"$TRAVIS_PULL_REQUEST" = "false"'
