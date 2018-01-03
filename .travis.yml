@@ -15,7 +15,7 @@ $encrypted_0031d8fb8ea0_iv -in .deploy/deploy_rsa.enc -out /tmp/deploy_rsa -d"
 deploy:
   provider: script
   skip_cleanup: true
-  script: "rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR 
+  script: "rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR/ 
 root@nick.bewegung.jetzt:/var/dib/wahlchecker/site"
   on:
     branch: master
