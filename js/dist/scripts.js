@@ -3096,6 +3096,10 @@ var MY_UTILS = (function( $ ) {
 			}
 
 		    // check increase currentSelectValue
+
+		    console.log( '_Nav.currentSelectValue[ _Nav.currentStep ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] );
+			console.log( '_Nav.electionDoneSelectValue: ' + _Nav.electionDoneSelectValue );
+
 		    if ( ! _Nav.currentSelectValue[ _Nav.currentStep ] ) {
 		    	// unset, start with first item, wait for votes
 		    	console.log( '! _Nav.currentSelectValue[ _Nav.currentStep ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] );
@@ -3126,7 +3130,7 @@ var MY_UTILS = (function( $ ) {
 		    	_Nav.previousStep != _Nav.currentStep 
 		    	&& _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 < _Nav.selectValues.length
 		    ) {
-		    	var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( _Nav.electionDoneSelectValue ) + 1 ) ];
+		    	var value = ( _Nav.electionDoneSelectValue ) ? _Nav.selectValues[ ( _Nav.selectValues.indexOf( _Nav.electionDoneSelectValue ) + 1 ) ] : _Nav.currentSelectValue[ _Nav.currentStep ];
 
 				var selectCoordinates = value.split( inputIdentifierSeparator );
 				var check = _checkElectionConfigCandidatesOrVotes( selectCoordinates[ 0 ], selectCoordinates[ 1 ], selectCoordinates[ 2 ] );
