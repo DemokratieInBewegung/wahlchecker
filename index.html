@@ -238,7 +238,7 @@
 								<button class="btn btn-default" data-fn="election-back-1"><i class="fa fa-arrow-left" aria-hidden="true"></i><span>Wahl konfigurieren</span></button>
 								</div>
 								<div class="col text-right">
-									<button class="btn btn-primary mr-sm-3" data-fn-="election-next-item" style="display: none;"><span>Nächsten Schritt vorbereiten</span><i class="fa fa-arrow-up" aria-hidden="true"></i></button>
+									<button class="btn btn-primary mr-sm-3" data-fn="election-next-item" data-tg="hide-last-item" style="display: none;"><span>Nächste vorbereiten</span><i class="fa fa-arrow-up" aria-hidden="true"></i></button>
 									<button class="btn btn-primary" type="submit"><span>Wahl durchführen</span><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
 								</div>
 							</div>
@@ -319,150 +319,154 @@
 
 					<!-- STEP 2 – EXECUTE ELECTION -->
 
-					<section data-tg="election-step-2">
+					<div data-tg="election-step-2">
 
-						<form data-fn="election-step-form-2">
+						<section>
+
+							<form data-fn="election-step-form-2">
+
+								<div class="mt-4 mb-3">
+
+									<h2 class="text-center">Wahl durchführen</h2>
+
+									<div class="form-group">
+										<label class="sr-only" for="election-step-select-2">Welche Wahl soll durchgeführt werden?</label>
+										<select class="form-control custom-select" id="election-step-select-2" data-fn="election-step-select-2">
+										</select>
+									</div>
+
+								</div>
+
+								<!-- step 2 item append -->
+								<div data-tg="election-item-append-2">
+								</div>
+
+								<!-- step 2 buttons -->
+
+								<div class="row">
+									<div class="col">
+									<button class="btn btn-default" data-fn="election-back-2"><i class="fa fa-arrow-left" aria-hidden="true"></i><span>Wahl vorbereiten</span></button>
+									</div>
+									<div class="col text-right">
+										<button class="btn btn-primary" type="submit"><span>Wahl auswerten<span data-tg="hide-last-item"> &amp; weiter</span></span><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+									</div>
+								</div>
+
+							</form>
+
+							<!-- step 2 templates -->
+							<div style="display: none;" aria-hidden="true">
+
+								<!-- step 2 item template -->
+								<div class="my-3" data-tg="election-item-template-2" style="display: none;">
+
+									<div class="card">
+										<div class="card-header">
+											{{ title }}
+										</div>
+										<div class="card-body pt-3 pb-0">
+											
+											<table class="table table-striped table-sm table-responsive-md execute-election-table">
+
+												<thead>
+													<tr>
+														<th scope="col"><i class="fa fa-user" aria-hidden="true"></i> <span>Name</span></th>
+														<th scope="col"><i class="fa fa-thumbs-up" aria-hidden="true"></i> <span>Ja</span></th>
+														<th scope="col"><i class="fa fa-thumbs-down" aria-hidden="true"></i> <span>Nein</span></th>
+													</tr>
+												</thead>
+
+												<!-- step 2 subitem append -->
+												<tbody data-g-tg="election-subitem-append-2">
+												</tbody>
+
+											</table>
+
+										</div>
+									</div>
+
+								</div>
+
+								<!-- step 2 subitem template -->
+								<table style="display: none;">
+									<tbody>
+										<tr style="display: none;" data-tg="election-subitem-template-2">
+											<td>
+												{{ candidateName }}
+											</td>
+											<td>
+												<label class="sr-only" for="name-{{ index }}">Ja</label>
+												<input class="form-control" id="votes-yes-{{ index }}" type="number" min="0" placeholder="Ja" data-g-fn="validate">
+											</td>
+											<td>
+												<label class="sr-only" for="name-{{ index }}">Nein</label>
+												<input class="form-control" id="votes-no-{{ index }}" type="number" min="0" placeholder="Nein" data-g-fn="validate">
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+							<!-- /step 2 templates -->
+
+						</section>
+
+						<!-- STEP 3 – ELECTION RESULTS -->
+
+						<section data-tg="election-step-3" style="display: none;">
 
 							<div class="mt-4 mb-3">
 
-								<h2 class="text-center">Wahl durchführen</h2>
+								<h2 class="text-center">Wahlergebnis</h2>
 
-								<div class="form-group">
-									<label class="sr-only" for="election-step-select-2">Welche Wahl soll durchgeführt werden?</label>
-									<select class="form-control custom-select" id="election-step-select-2" data-fn="election-step-select-2">
-									</select>
+								<!-- step 3 item append -->
+								<div data-tg="election-item-append-3">
 								</div>
 
 							</div>
 
-							<!-- step 2 item append -->
-							<div data-tg="election-item-append-2">
-							</div>
+							<!-- step 3 templates -->
+							<div style="display: none;" aria-hidden="true">
 
-							<!-- step 2 buttons -->
-
-							<div class="row">
-								<div class="col">
-								<button class="btn btn-default" data-fn="election-back-2"><i class="fa fa-arrow-left" aria-hidden="true"></i><span>Wahl vorbereiten</span></button>
-								</div>
-								<div class="col text-right">
-									<button class="btn btn-primary" type="submit"><span>Wahl auswerten</span><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
-								</div>
-							</div>
-
-						</form>
-
-						<!-- step 2 templates -->
-						<div style="display: none;" aria-hidden="true">
-
-							<!-- step 2 item template -->
-							<div class="my-3" data-tg="election-item-template-2" style="display: none;">
-
-								<div class="card">
-									<div class="card-header">
-										{{ title }}
-									</div>
-									<div class="card-body pt-3 pb-0">
-										
-										<table class="table table-striped table-sm table-responsive-md execute-election-table">
-
-											<thead>
-												<tr>
-													<th scope="col"><i class="fa fa-user" aria-hidden="true"></i> <span>Name</span></th>
-													<th scope="col"><i class="fa fa-thumbs-up" aria-hidden="true"></i> <span>Ja</span></th>
-													<th scope="col"><i class="fa fa-thumbs-down" aria-hidden="true"></i> <span>Nein</span></th>
-												</tr>
-											</thead>
-
-											<!-- step 2 subitem append -->
-											<tbody data-g-tg="election-subitem-append-2">
-											</tbody>
-
-										</table>
-
-									</div>
-								</div>
-
-							</div>
-
-							<!-- step 2 subitem template -->
-							<table style="display: none;">
-								<tbody>
-									<tr style="display: none;" data-tg="election-subitem-template-2">
-										<td>
-											{{ candidateName }}
-										</td>
-										<td>
-											<label class="sr-only" for="name-{{ index }}">Ja</label>
-											<input class="form-control" id="votes-yes-{{ index }}" type="number" min="0" placeholder="Ja" data-g-fn="validate">
-										</td>
-										<td>
-											<label class="sr-only" for="name-{{ index }}">Nein</label>
-											<input class="form-control" id="votes-no-{{ index }}" type="number" min="0" placeholder="Nein" data-g-fn="validate">
-										</td>
-									</tr>
-								</tbody>
-							</table>
-
-						</div>
-						<!-- /step 2 templates -->
-
-					</section>
-
-					<!-- STEP 3 – ELECTION RESULTS -->
-
-					<section data-tg="election-step-3">
-
-						<div class="mt-4 mb-3">
-
-							<h2 class="text-center">Wahlergebnis</h2>
-
-							<!-- step 3 item append -->
-							<div data-tg="election-item-append-3">
-							</div>
-
-						</div>
-
-						<!-- step 3 templates -->
-						<div style="display: none;" aria-hidden="true">
-
-							<!-- step 3 item template -->
-							<div class="my-3" data-tg="election-item-template-3" style="display: none;">
+								<!-- step 3 item template -->
+								<div class="my-3" data-tg="election-item-template-3" style="display: none;">
 
 
-								<div class="card my-3">
+									<div class="card my-3">
 
-									<div class="card-header">
-										<h3 class="text-center m-0">{{ title }}</h3>
-									</div>
+										<div class="card-header">
+											<h3 class="text-center m-0">{{ title }}</h3>
+										</div>
 
-									<!-- step 3 item append -->
-									<div class="card-body pt-3 pb-0" data-g-tg="election-subitemgroup-append-3">
+										<!-- step 3 item append -->
+										<div class="card-body pt-3 pb-0" data-g-tg="election-subitemgroup-append-3">
+
+										</div>
 
 									</div>
 
 								</div>
 
+								<!-- step 3 subitemgroup template -->
+								<div data-tg="election-subitemgroup-template-3" style="display: none;">
+									<h4>{{ title }}</h4>
+
+									<!-- step 3 subitemgroup append -->
+									<ol data-g-tg="election-subitem-append-3">
+									</ol>
+								</div>
+
+								<!-- step 3 subitem template -->
+								<li data-tg="election-subitem-template-3" style="display: none;">
+									{{ candidateName }}
+								</li>
+
 							</div>
+							<!-- /step 3 templates -->
 
-							<!-- step 3 subitemgroup template -->
-							<div data-tg="election-subitemgroup-template-3" style="display: none;">
-								<h4>{{ title }}</h4>
+						</section>
 
-								<!-- step 3 subitemgroup append -->
-								<ol data-g-tg="election-subitem-append-3">
-								</ol>
-							</div>
-
-							<!-- step 3 subitem template -->
-							<li data-tg="election-subitem-template-3" style="display: none;">
-								{{ candidateName }}
-							</li>
-
-						</div>
-						<!-- /step 3 templates -->
-
-					</section>
+					</div>
 
 					<!-- button class="btn btn-primary" type="button" data-toggle="modal" data-target="[data-tg='confirm-modal']">
 						Modal show

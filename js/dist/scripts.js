@@ -480,7 +480,6 @@ var MY_UTILS = (function( $ ) {
 	// TEST – TODO: remove
 	var currentElectionPreset;
 
-	var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
 	var url = new URL( document.location.href );
 	var preset = url.searchParams.get( 'preset' );
 	
@@ -1221,7 +1220,7 @@ var MY_UTILS = (function( $ ) {
 
 	// TODO: load existing config instead of this?
 	var currentElectionConfig = ( typeof currentElectionPreset !== 'undefined' ) ? $.extend( {}, electionConfig, currentElectionPreset ) : $.extend( {}, electionConfig );
-
+	
 	// TEMPLATE SELECTORS
 
     var identifierSuffix = '"]';
@@ -1252,8 +1251,6 @@ var MY_UTILS = (function( $ ) {
 	var subitemgroupAppendIdentifierPrefix = '[data-g-tg="election-subitemgroup-append-';
 	var subitemgroupIdentifierAttr = 'data-g-tg';
 	var subitemgroupIdentifierAttrVal = 'election-subitemgroup';
-
-	var subitemIdAttr = 'data-subitem-id';
 
 	// subitem
 	var subitemTemplateIdentifierPrefix = '[data-tg="election-subitem-template-';
@@ -1365,6 +1362,162 @@ var MY_UTILS = (function( $ ) {
 
 	}
 
+	// check current config for candidates or votes
+	_checkElectionConfigCandidatesOrVotes = function( keyIndex, i, j ) {
+		// get key
+		var key = Object.keys( currentElectionConfig )[ keyIndex ];
+
+		if ( ! key || typeof i === 'undefined' ) {
+			return false;
+		}
+
+		console.log( 'key: ' + key + ' – i: ' + i + ' – j: ' + j );
+
+		var hasCandidates = false;
+		var hasVotes = false;
+
+		_validCandidatesOrVotes = function( currentCandidatesList ) {
+
+			//console.log( '_validCandidatesOrVotes' );
+
+			var missingCandidates = false;
+			var missingVotes = false;
+
+			if ( typeof currentCandidatesList !== 'undefined' ) {
+
+				for ( var k = 0; k < currentCandidatesList.length; k++ ) {
+					//console.log( 'k: ' + k + ' (' + currentCandidatesList[ k ].candidate.name + ')' );
+					if ( typeof currentCandidatesList[ k ].candidate === 'undefined' ) {
+						missingCandidates = true;
+						//console.log( 'missingCandidates: ' + missingCandidates );
+					}
+					if ( 
+						typeof currentCandidatesList[ k ].yes === 'undefined' 
+						|| typeof currentCandidatesList[ k ].no === 'undefined' 
+					) {
+						missingVotes = true;
+						//console.log( 'missingVotes: ' + missingVotes );
+					}
+				}
+				//console.log( 'all valid' );
+
+				return [ ! missingCandidates, ! missingVotes ];
+			}
+			else {
+				//console.log( 'nothing – currentCandidatesList: ' + currentCandidatesList );
+				return [ false, false ];
+			}
+		}
+
+		// get current candidates to check
+		var candidatesList;
+
+		if (
+			typeof currentElectionConfig[ key ] !== 'undefined'
+			&& typeof currentElectionConfig[ key ][ i ] !== 'undefined'
+			&& typeof currentElectionConfig[ key ][ i ].candidates !== 'undefined'
+			&& currentElectionConfig[ key ][ i ].candidates.length > 0
+		) {
+			//console.log( 'candidates object found' );
+			if ( typeof j === 'undefined' ) {
+				//console.log( 'joint' );
+				// joint election, one candidates list
+				if (
+					typeof currentElectionConfig[ key ][ i ].candidates[ 0 ] !== 'undefined'
+				) {
+					candidatesList = currentElectionConfig[ key ][ i ].candidates;
+					//console.log( 'candidatesList: ' + candidatesList );
+				}
+			}
+			else {
+				//console.log( 'single' );
+				// single election, multiple candidates list
+				if (
+					typeof currentElectionConfig[ key ][ i ].candidates[ j ] !== 'undefined'
+					&& currentElectionConfig[ key ][ i ].candidates[ j ].length > 0
+				) {
+					candidatesList = currentElectionConfig[ key ][ i ].candidates[ j ];
+					//console.log( 'candidatesList: ' + candidatesList );
+				}
+			}
+
+		}
+
+		var result = _validCandidatesOrVotes( candidatesList );
+
+		return [ result[ 0 ], result[ 1 ] ];
+
+	}
+
+	// TODO: not in use
+	// validate all items
+	var validate = [];
+	var l = 0;
+	_validateItems = function() {
+
+		console.log( '_validateItems()' );
+
+		for ( var key in currentElectionConfig ) {
+
+        	var keyIndex = Object.keys( currentElectionConfig ).indexOf( key );
+
+        	for ( var i = 0; i < currentElectionConfig[ key ].length; i++ ) {
+
+        		if (
+					typeof currentElectionConfig[ key ] !== 'undefined'
+					&& typeof currentElectionConfig[ key ][ i ] !== 'undefined'
+					&& typeof currentElectionConfig[ key ][ i ].candidates !== 'undefined'
+					//&& currentElectionConfig[ key ][ i ].candidates.length > 0
+					&& typeof currentElectionConfig[ key ][ i ].candidates[ 0 ] !== 'undefined'
+					//&& currentElectionConfig[ key ][ i ].candidates[ 0 ].length > 0
+        		) {
+
+	        		// check joint or single
+	        		if (
+						typeof currentElectionConfig[ key ][ i ].candidates[ 0 ].candidate !== 'undefined'
+	        		) {
+	        			// joint, has candidate
+	        			console.log( 'joint, has candidate' );
+
+	        		}
+	        		else if (
+						typeof currentElectionConfig[ key ][ i ].candidates[ 0 ][ 0 ] !== 'undefined'
+						//&& currentElectionConfig[ key ][ i ].candidates[ 0 ][ 0 ].length > 0
+						&& typeof currentElectionConfig[ key ][ i ].candidates[ 0 ][ 0 ].candidate !== 'undefined'
+	        		) {
+	        			// single, has candidate
+	        			for ( var j = 0; j < currentElectionConfig[ key ][ i ].candidates.length; j++ ) {
+	        				console.log( 'single' );
+	        				if (
+								typeof currentElectionConfig[ key ][ i ].candidates[ j ][ 0 ] !== 'undefined'
+								&& typeof currentElectionConfig[ key ][ i ].candidates[ j ][ 0 ].candidate !== 'undefined'
+	        				) {
+	        					console.log( j + ' has candidate' );
+	        				}
+	        				else {
+	        					console.log( j + ' has no candidate' );
+	        				}
+	        			}
+
+	        		}
+	        		else {
+	        			// has no candidates
+	        			console.log( 'has no candidates 2' );
+	        		}
+
+        		}
+        		else {
+        			// has no candidates
+        			console.log( 'has no candidates 1' );
+
+        		}
+
+        	}
+
+		}
+
+	}
+
     // add sublist item (candidate list item)
     $.fn._addSublistItems = function( currentCount, currentItemIndex, currentI, currentJ, currentCandidates ) {
 
@@ -1469,8 +1622,6 @@ var MY_UTILS = (function( $ ) {
 
 		var $subitemClone = $( this );
 		var $input = $subitemClone.find( validateNumberInputIdentifier );
-
-		$input.addClass( 'TEST' );
 
 		if ( $input.length > 0 ) {
 
@@ -1790,7 +1941,7 @@ var MY_UTILS = (function( $ ) {
 		
 		var output;
 
-		console.log( '_calculateElectionResult – input: ' + JSON.stringify( input, null, 2 ) );
+		//console.log( '_calculateElectionResult – input: ' + JSON.stringify( input, null, 2 ) );
 		
 		// do magic here...
 
@@ -2078,7 +2229,7 @@ var MY_UTILS = (function( $ ) {
     		delete currentElectionConfig[ deleteKeys[ i ] ];
     	}
 
-		console.log( 'config step 0 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2 ) );
+		//console.log( 'config step 0 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2 ) );
 
 	}
 
@@ -2120,10 +2271,10 @@ var MY_UTILS = (function( $ ) {
         	// elections within group
 			for ( var i = 0; i < currentElectionConfig[ key ].length; i++ ) {
 
-				// push candidates
-				if ( typeof currentElectionConfig[ key ][ i ][ 'candidates' ] === 'undefined' ) {
-					currentElectionConfig[ key ][ i ][ 'candidates' ] = [];
-				}
+				// reset candidates
+				//if ( typeof currentElectionConfig[ key ][ i ][ 'candidates' ] === 'undefined' ) {
+				currentElectionConfig[ key ][ i ][ 'candidates' ] = [];
+				//}
 
 	        	var election = currentElectionConfig[ key ][ i ].name;
 
@@ -2176,6 +2327,8 @@ var MY_UTILS = (function( $ ) {
 						nameIndexes = itemIndex + inputIdentifierSeparator + i + inputIdentifierSeparator + j + inputIdentifierSeparator;
 						matchingKeys = _filterMatchingIndexes( valuesKeys, nameStart_name + nameIndexes );
 
+						currentElectionConfig[ key ][ i ].candidates[ j ] = [];
+
 						var reduceIndex = 0;
 						for ( var k = 0; k < matchingKeys.length; k++ ) {
 
@@ -2184,12 +2337,12 @@ var MY_UTILS = (function( $ ) {
 		        				var candidate = _getCandidate( matchingKeys[ k ] );
 
 		        				// check if already exiting or push
-		        				if ( typeof currentElectionConfig[ key ][ i ].candidates === 'undefined' ) {
+		        				/*if ( typeof currentElectionConfig[ key ][ i ].candidates === 'undefined' ) {
 		        					currentElectionConfig[ key ][ i ].candidates = [];
 		        				}
 		        				if ( typeof currentElectionConfig[ key ][ i ].candidates[ j ] === 'undefined' ) {
 		        					currentElectionConfig[ key ][ i ].candidates[ j ] = [];
-		        				}
+		        				}*/
 
 		        				if ( typeof currentElectionConfig[ key ][ i ].candidates[ j ][ k - reduceIndex ] === 'undefined' ) {
 		        					currentElectionConfig[ key ][ i ].candidates[ j ][ k - reduceIndex ] = {};
@@ -2208,7 +2361,7 @@ var MY_UTILS = (function( $ ) {
 
         }
 
-		console.log( 'config step 1 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2 ) );
+		//console.log( 'config step 1 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2 ) );
 
 	}
 
@@ -2282,7 +2435,7 @@ var MY_UTILS = (function( $ ) {
 
         }
 
-		console.log( 'config step 2 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2) );
+		//console.log( 'config step 2 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2) );
 
 	}
 
@@ -2374,6 +2527,9 @@ var MY_UTILS = (function( $ ) {
 			// append
         	$itemClone.appendTo( $itemAppend );
 
+        	// show results container
+        	Utils.$targetElems.filter( stepIdentifierPrefix + step + identifierSuffix ).show();
+
         }
 
     };
@@ -2397,7 +2553,7 @@ var MY_UTILS = (function( $ ) {
         $itemAppend.empty();
 
         // reset select
-        _Navigation.$select[ step ]
+        _Nav.$select[ step ]
         	.empty()
         	.append( selectInitialOption )
         ;
@@ -2409,7 +2565,7 @@ var MY_UTILS = (function( $ ) {
 	        var electionGroup = key;
 
 	        // fill select
-	        //_Navigation.$select[ step ].append( '<option value="' + itemIndex + '">' + electionGroup + '</option>' );
+	        //_Nav.$select[ step ].append( '<option value="' + itemIndex + '">' + electionGroup + '</option>' );
 
         	// elections within group
 			for ( var i = 0; i < currentElectionConfig[ key ].length; i++ ) {
@@ -2427,7 +2583,7 @@ var MY_UTILS = (function( $ ) {
 	        		var j = currentJ;
 
 			        // fill select
-			        _Navigation.$select[ step ].append( '<option value="' + itemIndex + inputIdentifierSeparator + i + ( ( typeof j !== 'undefined' ) ? inputIdentifierSeparator + j : '' ) + '">' + title + '</option>' );
+			        _Nav.$select[ step ].append( '<option value="' + itemIndex + inputIdentifierSeparator + i + ( ( typeof j !== 'undefined' ) ? inputIdentifierSeparator + j : '' ) + '">' + title + '</option>' );
 
 					$itemClone
 						.removeAttr( 'data-tg style' )
@@ -2469,7 +2625,7 @@ var MY_UTILS = (function( $ ) {
 			    			] )
 			    			.removeAttr( 'style data-tg' )
 			    			.attr( subitemIdentifierAttr, subitemIdentifierAttrVal )
-			    			.attr( subitemIdAttr, subitemsCount )
+			    			.attr( subitemIdAttr, l )
 			    			.show()
 							._validateNumberInput()
 						;
@@ -2487,10 +2643,11 @@ var MY_UTILS = (function( $ ) {
 			    		}
 						// fill if pre configured
 						if ( candidates && candidates[ l ] && candidates[ l ].candidate ) {
-							if ( typeof candidates[ l ].yes !== 'undefined' && candidates[ l ].yes >= 0 ) {
+							//console.log( 'PREFILL ' + key + ' ' + i + ' ' + j + ' – ' + l + ' (' + candidates[ l ].candidate.name + ') – yes: ' + candidates[ l ].yes + ' – no: ' + candidates[ l ].no );
+							if ( typeof candidates[ l ].yes !== 'undefined' ) {
 								$subitemClone.find( 'input[name^="yes"]' ).val( candidates[ l ].yes );
 							}
-							if ( typeof candidates[ l ].no !== 'undefined' && candidates[ l ].no >= 0 ) {
+							if ( typeof candidates[ l ].no !== 'undefined' ) {
 								$subitemClone.find( 'input[name^="no"]' ).val( candidates[ l ].no );
 							}
 						}
@@ -2535,6 +2692,8 @@ var MY_UTILS = (function( $ ) {
 	        	var $form = $( this );
 	        	$form._getElectionCurrentConfig_2();
 
+	        	//_validateItems();
+
 	        	// get election result
 	        	if ( _getElectionResult() ) {
 
@@ -2542,6 +2701,8 @@ var MY_UTILS = (function( $ ) {
 	        		
 	        		_buildStep_3();
 	        	}
+
+	        	$form.trigger( 'built' );
 
 	        } )
 	    ;
@@ -2567,7 +2728,7 @@ var MY_UTILS = (function( $ ) {
         $itemAppend.empty();
 
         // reset select
-        _Navigation.$select[ step ]
+        _Nav.$select[ step ]
         	.empty()
         	.append( selectInitialOption )
         ;
@@ -2579,7 +2740,7 @@ var MY_UTILS = (function( $ ) {
 	        var electionGroup = key;
 
 	        // fill select
-	        //_Navigation.$select[ step ].append( '<option value="' + itemIndex + '">' + electionGroup + '</option>' );
+	        //_Nav.$select[ step ].append( '<option value="' + itemIndex + '">' + electionGroup + '</option>' );
 
         	// elections within group
 			for ( var i = 0; i < currentElectionConfig[ key ].length; i++ ) {
@@ -2597,7 +2758,7 @@ var MY_UTILS = (function( $ ) {
 	        		var j = currentJ;
 
 			        // fill select
-			        _Navigation.$select[ step ].append( '<option value="' + itemIndex + inputIdentifierSeparator + i + ( ( typeof j !== 'undefined' ) ? inputIdentifierSeparator + j : '' ) + '">' + title + '</option>' );
+			        _Nav.$select[ step ].append( '<option value="' + itemIndex + inputIdentifierSeparator + i + ( ( typeof j !== 'undefined' ) ? inputIdentifierSeparator + j : '' ) + '">' + title + '</option>' );
 
 					$itemClone
 						.removeAttr( 'data-tg style' )
@@ -2676,7 +2837,11 @@ var MY_UTILS = (function( $ ) {
 	        	var $form = $( this );
 	        	$form._getElectionCurrentConfig_1();
 
+	        	//_validateItems();
+
 	        	_buildStep_2();
+
+	        	$form.trigger( 'built' );
 
 	        } )
 	    ;
@@ -2835,10 +3000,326 @@ var MY_UTILS = (function( $ ) {
 
 	        	_buildStep_1();
 
+	        	$form.trigger( 'built' );
+
 	        } )
 	    ;
 
     };
+
+    // NAVIGATION
+
+	// vars
+    var _Nav = {
+    	currentStep: 0,
+    	previousStep: null,
+    	currentItemCoordinates: null,
+    	steps: 3,
+    	$electionStep: [],
+    	$stepPrev: [],
+    	$stepNext: [],
+    	$select: [],
+    	selectValues: [],
+    	currentSelectValue: [],
+    	electionDoneSelectValue: null
+    };
+
+	_Nav._getSelectValues = function( select ) {
+		var values = [];
+		$( select ).find( 'option' ).each( function() {
+			values.push( $( this ).val() );
+		} );
+		return values;
+	}
+
+	_Nav._gotoStep = function( gotoStep, gotoSelectValue ) {
+
+		_Nav.previousStep = _Nav.currentStep;
+		_Nav.currentStep = gotoStep;
+
+		console.log( 'GOTO: ' + _Nav.currentStep + ' FROM: ' + _Nav.previousStep );
+
+		for ( var i = 0; i < _Nav.steps; i++ ) {
+
+    		if ( i !== _Nav.currentStep ) {
+    			// hide all step sections but current
+    			_Nav.$electionStep[ i ].hide();
+    		}
+    		else {
+    			// show current
+    			_Nav.$electionStep[ i ].show();
+    		}
+
+		}
+
+		// get select values if empty && step contains select 
+		if ( 
+			_Nav.selectValues.length == 0 
+			&& ( _Nav.currentStep == 1 || _Nav.currentStep == 2 )
+		) {
+			// iterate each selection
+			_Nav.selectValues = _Nav._getSelectValues( _Nav.$select[ _Nav.currentStep ] );
+		}
+
+		// TODO BEFORE: allow execute election only if (minimum) first item has candidates
+		// if step == 2 set select to 1st item
+		if ( _Nav.currentStep >= 2 ) {
+
+			// use _Nav.currentSelectValue[ 2 ] instead of _Nav.currentSelectValue[ _Nav.currentStep ]
+
+			_increaseSelectValue = function( value ) {
+				console.log( '_increaseSelectValue: ' + value );
+				// validate before increase
+				var selectCoordinates = value.split( inputIdentifierSeparator );
+				var check = _checkElectionConfigCandidatesOrVotes( selectCoordinates[ 0 ], selectCoordinates[ 1 ], selectCoordinates[ 2 ] );
+				console.log( 'check for candidates & votes: ' + check[ 0 ] + ' – ' + check[ 1 ] );
+				if ( check[ 0 ] === true ) {
+					console.log( 'valid' );
+					_Nav.currentSelectValue[ _Nav.currentStep ] = value;
+					_Nav.$select[ _Nav.currentStep ]
+						.val( value )
+						.trigger( 'change' )
+					;
+				}
+				else {
+					console.log( 'candidates missing, go back' );
+					_Nav._gotoStep( _Nav.currentStep - 1 );
+					// note: _gotoStep() has already changed _Nav.currentStep
+					_Nav.$select[ _Nav.currentStep ]
+						.val( value )
+						.trigger( 'change' )
+					;
+					//_Nav.electionDoneSelectValue = _Nav.selectValues[ ( _Nav.selectValues.indexOf( value ) - 1 ) ];
+				}
+				_Nav.currentItemCoordinates = value.split( inputIdentifierSeparator );
+
+			}
+
+		    // check increase currentSelectValue
+		    if ( ! _Nav.currentSelectValue[ _Nav.currentStep ] ) {
+		    	// unset, start with first item, wait for votes
+		    	console.log( '! _Nav.currentSelectValue[ _Nav.currentStep ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] );
+				var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( '-1' ) + 1 ) ] || _Nav.selectValues[ 0 ];
+				_Nav.currentSelectValue[ _Nav.currentStep ] = value;
+				// set select to first item
+				_Nav.$select[ _Nav.currentStep ]
+					.val( value )
+					.trigger( 'change' )
+				;
+				//_increaseSelectValue( value );
+		    }
+		    else if ( 
+		    	_Nav.previousStep == _Nav.currentStep
+		    	&& _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 < _Nav.selectValues.length 
+		    ) {
+		    	// already set, go to next
+
+				// TODO: wait for successful election result?
+				// remember latest select value of successful item before increase
+				_Nav.electionDoneSelectValue = _Nav.currentSelectValue[ _Nav.currentStep ];
+		    	console.log( '_Nav.currentSelectValue[ _Nav.currentStep ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] );
+				console.log( '    _Nav.electionDoneSelectValue: ' + _Nav.electionDoneSelectValue );
+				var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 ) ];
+				_increaseSelectValue( value );
+		    }
+		    else if ( 
+		    	_Nav.previousStep != _Nav.currentStep 
+		    	&& _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 < _Nav.selectValues.length
+		    ) {
+		    	var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( _Nav.electionDoneSelectValue ) + 1 ) ];
+
+				var selectCoordinates = value.split( inputIdentifierSeparator );
+				var check = _checkElectionConfigCandidatesOrVotes( selectCoordinates[ 0 ], selectCoordinates[ 1 ], selectCoordinates[ 2 ] );
+				console.log( 'check for candidates & votes: ' + check[ 0 ] + ' – ' + check[ 1 ] );
+				if ( check[ 0 ] === true ) {
+					_Nav.currentSelectValue[ _Nav.currentStep ] = value;
+					// set select to first item
+					_Nav.$select[ _Nav.currentStep ]
+						.val( value )
+						.trigger( 'change' )
+					;
+				}
+				else {
+					console.log( 'candidates missing, go back' );
+					_Nav._gotoStep( _Nav.currentStep - 1 );
+					// note: _gotoStep() has already changed _Nav.currentStep
+					_Nav.$select[ _Nav.currentStep ]
+						.val( value )
+						.trigger( 'change' )
+					;
+				}
+
+		    	console.log( 'back to step 2' );
+		    }
+		    else {
+		    	console.log( 'result complete' );
+		    }
+
+		    // set select
+		    if ( !! gotoSelectValue && _Nav.selectValues.length > 0 ) {
+				_Nav.$select[ _Nav.currentStep ]
+					.val( gotoSelectValue )
+					.trigger( 'change' )
+				;
+		    }
+
+		}
+
+		_Nav._toTop();
+
+		console.log( 'nav goto ' + _Nav.currentStep );
+	}
+
+	_Nav._prev = function( gotoSelectValue ) {
+
+		var currentStep = ( _Nav.currentStep > 0 ) ? _Nav.currentStep - 1 : 0;
+		_Nav._gotoStep( currentStep, gotoSelectValue );
+		_Nav._toTop();
+
+		console.log( 'nav prev ' + _Nav.currentStep );
+	}
+
+	_Nav._next = function( gotoSelectValue ) {
+
+		var currentStep = ( _Nav.currentStep < _Nav.steps - 1 ) ? _Nav.currentStep + 1 : _Nav.steps - 1;
+		_Nav._gotoStep( currentStep, gotoSelectValue );
+		_Nav._toTop();
+
+		console.log( 'nav next ' + _Nav.currentStep );
+	}
+
+	_Nav._toTop = function() {
+		//Utils.$scrollRoot.animate( { scrollTop: 0 }, 300 );
+		Utils.$functionElems.filter( '[data-fn="to-top-wrapper"]' ).children( 'a' ).trigger( 'click' );
+	}
+
+    _Nav._init = function() {
+
+    	// get step sections, get back buttons
+    	for ( var i = 0; i < _Nav.steps; i++ ) {
+    		//console.log( 'i: ' + i );
+
+    		_Nav.$electionStep[ i ] = Utils.$targetElems.filter( stepIdentifierPrefix + i + identifierSuffix );
+
+    		// prev (only step 1 & 2)
+    		if ( i > 0 ) {
+    			_Nav.$stepPrev[ i ] = Utils.$functionElems.filter( stepPrevIdentifierPrefix + i + identifierSuffix );
+    			_Nav.$stepPrev[ i ].on( 'click', function( event ) {
+    				event.preventDefault();
+    				_Nav._prev();
+    			} );
+    		}
+
+			// next (all but step 3)
+    		if ( i < _Nav.steps ) {
+    			_Nav.$stepNext[ i ] = Utils.$functionElems.filter( stepFormIdentifierPrefix + i + identifierSuffix );
+    			// use own event – build first, then navigate since otherwise next step’s data is empty
+    			_Nav.$stepNext[ i ].on( 'built', function() {
+    				_Nav._next();
+    			} );
+    		}
+
+    		// get select / select change functions
+    		if ( i > 0 ) {
+
+	    		if ( Utils.$functionElems.filter( stepSelectIdentifierPrefix + i + identifierSuffix ).length > 0 ) {
+	    			_Nav.$select[ i ] = Utils.$functionElems.filter( stepSelectIdentifierPrefix + i + identifierSuffix );
+
+	    			_Nav.currentSelectValue[ i ] = _Nav.$select[ i ].val();
+
+	    			console.log( '_Nav.currentSelectValue[ ' + i + ' ]: ' + _Nav.currentSelectValue[ i ] );
+
+	    			_Nav.$select[ i ].on( 'change', function() {
+	    				console.log( 'change ' + $( this ).val() );
+
+	    				var value = $( this ).val();
+	    				var $form = $( this ).closest( 'form' );
+	    				var $showStepsButLast = $form .find( Utils.$targetElems.filter( '[data-tg="hide-last-item"]' ) );
+
+	    				// refresh navigator data
+	    				_Nav.currentSelectValue[ i ] = value;
+	    				_Nav.currentItemCoordinates = value.split( inputIdentifierSeparator );
+
+	    				if ( value != -1 ) {
+		    				// hide all
+		    				$form
+		    					.find( '[' + itemIdAttr + ']' )
+		    					.hide()
+		    				;
+		    				// show selected
+		    				$form
+		    					.find( '[' + itemIdAttr + '^="' + value + '"]' )
+		    					.show()
+		    				;
+
+		    				// show next item button / button addon (only if not last value)
+		    				if ( value != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) {
+			    				$showStepsButLast.show();
+			    			}
+			    			else {
+			    				$showStepsButLast.hide();
+			    			}
+	    				}
+	    				else {
+		    				// show all
+
+		    				// get current item coordinates
+		    				_Nav.currentItemCoordinates = null;
+
+		    				$form
+		    					.find( '[' + itemIdAttr + ']' )
+		    					.show()
+		    				;
+
+		    				// hide next item button / button addon
+			    			$showStepsButLast.hide();
+	    				}
+
+	    			} );
+	    		}
+    		}
+
+			// next item button
+			if ( i == 1 ) {
+				if ( Utils.$functionElems.filter( '[data-fn="election-next-item"]' ) ) {
+					$nextItemButton = Utils.$functionElems.filter( '[data-fn="election-next-item"]' );
+					
+					$nextItemButton.on( 'click', function( event ) {
+						event.preventDefault();
+						var value = _Nav.$select[ _Nav.currentStep ].val()
+						var newValue = _Nav.selectValues[ ( _Nav.selectValues.indexOf( value ) + 1 ) ];
+						_Nav.$select[ _Nav.currentStep ]
+							.val( newValue )
+							.trigger( 'change' )
+						;
+						_Nav.currentSelectValue[ i ] = newValue;
+		    			_Nav.currentItemCoordinates = newValue.split( inputIdentifierSeparator );
+						_Nav._toTop();
+					} );
+					
+				}
+			}
+
+    	}
+
+    	// hide step sections but current
+    	_Nav._gotoStep( _Nav.currentStep );
+
+    }
+
+    _Nav._reset = function() {
+
+    	_Nav.currentStep = 0;
+    	_Nav.previousStep = null;
+    	_Nav.selectValues = [];
+    	_Nav.currentSelectValue = [];
+    	_Nav.electionDoneSelectValue = null;
+
+    	_Nav._gotoStep( _Nav.currentStep );
+
+    }
+
+    // MENU FUNCTIONS
 
 	// download file
 	function _download( content, name, type ) {
@@ -2854,9 +3335,9 @@ var MY_UTILS = (function( $ ) {
 		// save config if exists
 
 		// get current config of current step
-		console.log( 'save step: ' + _Navigation.currentStep );
+		console.log( 'save step: ' + _Nav.currentStep );
 
-		var currentStep = ( _Navigation.currentStep < _Navigation.steps - 1 ) ? _Navigation.currentStep : _Navigation.steps - 2;
+		var currentStep = ( _Nav.currentStep < _Nav.steps - 1 ) ? _Nav.currentStep : _Nav.steps - 2;
 		Utils.$functionElems.filter( stepFormIdentifierPrefix + currentStep + identifierSuffix )[ ( '_getElectionCurrentConfig_' + currentStep ) ]();
 
 		if ( typeof currentElectionConfig !== 'undefined' ) {
@@ -2953,6 +3434,10 @@ var MY_UTILS = (function( $ ) {
 				Utils.$targetElems.filter( '[data-tg="load-modal"]' ).modal( 'hide' );
 
 				_buildStep_0();
+				_Nav._reset();
+
+		    	// hide results container
+		    	Utils.$targetElems.filter( stepIdentifierPrefix + 3 + identifierSuffix ).hide();
 
 				// reset file input
 				$fileInput.val( '' );
@@ -2976,12 +3461,12 @@ var MY_UTILS = (function( $ ) {
 
         var defaults = {
 			header: 'Bitte bestätigen',
-			headerState: 'modal-title',
+			headerClass: 'modal-title',
 			body: 'Bitte bestätige die Aktion.',
-			dismissButtonState: 'btn btn-default',
-			confirmButtonState: 'btn btn-danger',
-			dismissButtonIcon: 'fa fa-close',
-			confirmButtonIcon: 'fa fa-check',
+			dismissButtonClass: 'btn btn-default',
+			confirmButtonClass: 'btn btn-danger',
+			dismissButtonIconClass: 'fa fa-close',
+			confirmButtonIconClass: 'fa fa-check',
 			dismissButtonText: 'Abbrechen',
 			confirmButtonText: 'Ok',
 			confirmCallback: null,
@@ -2992,17 +3477,17 @@ var MY_UTILS = (function( $ ) {
 
         var $modal = $( this );
 
-		$modal.find( '[data-g-tg="modal-title"]' ).html( options.header ).attr( 'class', options.headerState );
+		$modal.find( '[data-g-tg="modal-title"]' ).html( options.header ).attr( 'class', options.headerClass );
 		$modal.find( '[data-g-tg="modal-body"]' ).html( options.body );
 
 		var $confirmButton = $modal.find( '[data-g-fn="confirm-modal-confirm"]' );
-		$confirmButton.attr( 'class', options.confirmButtonState );
-		$confirmButton.find( '[data-g-tg="btn-icon"]' ).attr( 'class', options.confirmButtonIcon );
+		$confirmButton.attr( 'class', options.confirmButtonClass );
+		$confirmButton.find( '[data-g-tg="btn-icon"]' ).attr( 'class', options.confirmButtonIconClass );
 		$confirmButton.find( '[data-g-tg="btn-text"]' ).html( options.confirmButtonText );
 
 		var $dismissButton = $modal.find( '[data-g-fn="confirm-modal-dismiss"]' );
-		$dismissButton.attr( 'class', options.dismissButtonState );
-		$dismissButton.find( '[data-g-tg="btn-icon"]' ).attr( 'class', options.dismissButtonIcon );
+		$dismissButton.attr( 'class', options.dismissButtonClass );
+		$dismissButton.find( '[data-g-tg="btn-icon"]' ).attr( 'class', options.dismissButtonIconClass );
 		$dismissButton.find( '[data-g-tg="btn-text"]' ).html( options.dismissButtonText );
 
 		$modal.modal( 'show' );
@@ -3027,13 +3512,13 @@ var MY_UTILS = (function( $ ) {
 		var $confirmModal = Utils.$targetElems.filter( '[data-tg="confirm-modal"]' );
 
 		$confirmModal._confirmModal( {
-			header: 'Bitte bestätigen',
-			headerState: 'modal-title text-danger',
+			header: 'Löschen bestätigen',
+			headerClass: 'modal-title text-danger',
 			body: 'Möchtest Du wirklich die gesamte Wahl zurücksetzen?',
-			dismissButtonState: 'btn btn-default',
-			confirmButtonState: 'btn btn-danger',
-			dismissButtonIcon: 'fa fa-close',
-			confirmButtonIcon: 'fa fa-trash',
+			dismissButtonClass: 'btn btn-default',
+			confirmButtonClass: 'btn btn-danger',
+			dismissButtonIconClass: 'fa fa-close',
+			confirmButtonIconClass: 'fa fa-trash',
 			dismissButtonText: 'Nein, doch nicht',
 			confirmButtonText: 'Zurücksetzen',
 			confirmCallback: function() {
@@ -3042,221 +3527,12 @@ var MY_UTILS = (function( $ ) {
 		} );
 	} );
 
-	// check current config for candidates or votes
-	_checkElectionConfigCandidatesOrVotes = function( keyIndex, i, j ) {
-		// get key
-		var key = Object.keys( currentElectionConfig )[ keyIndex ];
+	// INIT
 
-		if ( ! key || typeof i === 'undefined' ) {
-			return false;
-		}
-
-		console.log( 'key: ' + key + ' – i: ' + i + ' – j: ' + j );
-
-		var hasCandidates = false;
-		var hasVotes = false;
-
-		_validCandidatesOrVotes = function( currentCandidatesList ) {
-
-			console.log( '_validCandidatesOrVotes' );
-
-			var missingCandidates = false;
-			var missingVotes = false;
-
-			if ( typeof currentCandidatesList !== 'undefined' ) {
-
-				for ( var k = 0; k < currentCandidatesList.length; k++ ) {
-					console.log( 'k: ' + k );
-					if ( typeof currentCandidatesList[ k ].candidate === 'undefined' ) {
-						missingCandidates = true;
-						console.log( 'missingCandidates: ' + missingCandidates );
-					}
-					if ( 
-						typeof currentCandidatesList[ k ].yes === 'undefined' 
-						|| typeof currentCandidatesList[ k ].no === 'undefined' 
-					) {
-						missingVotes = true;
-						console.log( 'missingVotes: ' + missingVotes );
-					}
-				}
-
-				return [ ! missingCandidates, ! missingVotes ];
-			}
-			else {
-				return [ false, false ];
-			}
-		}
-
-		// get current candidates to check
-		var candidatesList;
-
-		if (
-			typeof currentElectionConfig[ key ] !== 'undefined'
-			&& typeof currentElectionConfig[ key ][ i ] !== 'undefined'
-			&& typeof currentElectionConfig[ key ][ i ].candidates !== 'undefined'
-			&& currentElectionConfig[ key ][ i ].candidates.length > 0
-		) {
-			console.log( 'candidates object found' );
-			if ( typeof j === 'undefined' ) {
-				console.log( 'joint' );
-				// joint election, one candidates list
-				if (
-					typeof currentElectionConfig[ key ][ i ].candidates[ 0 ] !== 'undefined'
-				) {
-					//console.log( 'candidatesList' );
-					candidatesList = currentElectionConfig[ key ][ i ].candidates;
-				}
-			}
-			else {
-				console.log( 'single' );
-				// single election, multiple candidates list
-				if (
-					typeof currentElectionConfig[ key ][ i ].candidates[ j ] !== 'undefined'
-					&& currentElectionConfig[ key ][ i ].candidates[ j ].length > 0
-					&& typeof currentElectionConfig[ key ][ i ].candidates[ j ][ 0 ] !== 'undefined'
-					//&& currentElectionConfig[ key ][ i ].candidates[ j ][ 0 ].length > 0
-					//&& typeof currentElectionConfig[ key ][ i ].candidates[ j ][ 0 ].candidate !== 'undefined'
-				) {
-					//console.log( 'candidatesList' );
-					candidatesList = currentElectionConfig[ key ][ i ].candidates[ j ];
-				}
-			}
-
-		}
-
-		var result = _validCandidatesOrVotes( candidatesList );
-
-		return [ result[ 0 ], result[ 1 ] ];
-
-	}
-
-	// navigation
-    var _Navigation = {
-    	currentStep: 0,
-    	steps: 4,
-    	$electionStep: [],
-    	$stepPrev: [],
-    	$stepNext: [],
-    	$select: []
-    };
-
-	_Navigation._prev = function() {
-		// if last step jump to steps -2
-		if ( _Navigation.currentStep == _Navigation.steps - 1 ) {
-			_Navigation.currentStep = _Navigation.currentStep - 2;
-			_Navigation.$electionStep[ _Navigation.currentStep + 2 ].hide();
-		}
-		else {
-			_Navigation.currentStep = ( _Navigation.currentStep > 0 ) ? _Navigation.currentStep - 1 : 0;
-		}
-		_Navigation.$electionStep[ _Navigation.currentStep + 1 ].hide();
-		_Navigation.$electionStep[ _Navigation.currentStep ].show();
-		_Navigation._toTop();
-
-		console.log( 'nav prev ' + _Navigation.currentStep );
-	}
-
-	_Navigation._next = function() {
-		_Navigation.currentStep = ( _Navigation.currentStep < _Navigation.steps ) ? _Navigation.currentStep + 1 : _Navigation.steps;
-		if ( _Navigation.currentStep < _Navigation.steps - 1 ) {
-			_Navigation.$electionStep[ _Navigation.currentStep - 1 ].hide();
-			_Navigation._toTop();
-		}
-		_Navigation.$electionStep[ _Navigation.currentStep ].show();
-
-		console.log( 'nav next ' + _Navigation.currentStep );
-	}
-
-	_Navigation._toTop = function() {
-		//Utils.$scrollRoot.animate( { scrollTop: 0 }, 300 );
-		Utils.$functionElems.filter( '[data-fn="to-top-wrapper"]' ).children( 'a' ).trigger( 'click' );
-	}
-
-    _Navigation._init = function() {
-
-    	// get step sections, get back buttons
-    	for ( var i = 0; i <= _Navigation.steps; i++ ) {
-    		//console.log( 'i: ' + i );
-
-    		_Navigation.$electionStep[ i ] = Utils.$targetElems.filter( stepIdentifierPrefix + i + identifierSuffix );
-
-    		// prev (only step 1 & 2)
-    		if ( i > 0 && i < _Navigation.steps - 1 ) {
-    			_Navigation.$stepPrev[ i ] = Utils.$functionElems.filter( stepPrevIdentifierPrefix + i + identifierSuffix );
-    			_Navigation.$stepPrev[ i ].on( 'click', function( event ) {
-    				event.preventDefault();
-    				_Navigation._prev();
-    			} );
-    		}
-
-			// next (all but step 3)
-    		if ( i < _Navigation.steps ) {
-    			_Navigation.$stepNext[ i ] = Utils.$functionElems.filter( stepFormIdentifierPrefix + i + identifierSuffix );
-    			_Navigation.$stepNext[ i ].on( 'submit', function() {
-    				_Navigation._next();
-
-    				// TODO BEFORE: allow execute election only if (minimum) first item has candidates
-    				// TODO: if step == 2 set select to 1st item
-    				if ( _Navigation.currentStep == 2 ) {
-    					// iterate each selection
-    					//_Navigation.$select[ _Navigation.currentStep ].
-    				}
-
-    			} );
-    		}
-
-    		// hide step sections but current
-    		if ( i !== _Navigation.currentStep ) {
-    			_Navigation.$electionStep[ i ].hide();
-    		}
-
-    		// get select
-    		if ( Utils.$functionElems.filter( stepSelectIdentifierPrefix + i + identifierSuffix ).length > 0 ) {
-    			_Navigation.$select[ i ] = Utils.$functionElems.filter( stepSelectIdentifierPrefix + i + identifierSuffix );
-    			_Navigation.$select[ i ].on( 'change', function() {
-    				console.log( 'change ' + $( this ).val() );
-
-    				var value = $( this ).val();
-    				var $form = $( this ).closest( 'form' );
-
-    				if ( value != -1 ) {
-
-	    				// TEST – TODO: remove
-	    				var selectCoordinates = value.split( inputIdentifierSeparator );
-
-	    				var check = _checkElectionConfigCandidatesOrVotes( selectCoordinates[ 0 ], selectCoordinates[ 1 ], selectCoordinates[ 2 ] );
-	    				console.log( 'check for candidates & votes: ' + check[ 0 ] + ' – ' + check[ 1 ] );
-						
-	    				// hide all
-	    				$form
-	    					.find( '[' + itemIdAttr + ']' )
-	    					.hide()
-	    				;
-	    				// show selected
-	    				$form
-	    					.find( '[' + itemIdAttr + '^="' + value + '"]' )
-	    					.show()
-	    				;
-    				}
-    				else {
-	    				// show all
-	    				$form
-	    					.find( '[' + itemIdAttr + ']' )
-	    					.show()
-	    				;
-    				}
-
-    			} );
-    		}
-
-    	}
-
-    }
-
-    // init (called from init.js)
+    // (called from init.js)
     $.fn.dibElection = function() {
     	_buildStep_0();
-    	_Navigation._init();
+    	_Nav._init();
     }
 
 } )( jQuery, MY_UTILS );
