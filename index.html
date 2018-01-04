@@ -530,21 +530,19 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 					</div>
-					<form>
-						<div class="modal-body">
-							<label for="save-file-name">Dateiname</label>
-							<div class="input-group">
-								<input class="form-control" id="save-file-name" type="text" name="file_name" placeholder="Dateiname" aria-describedby="save-file-name-append" required>
-								<div class="input-group-append input-group-addon">
-									<span class="input-group-text" id="save-file-name-append">.json</span>
-								</div>
+					<div class="modal-body">
+						<label for="save-file-name">Dateiname</label>
+						<div class="input-group">
+							<input class="form-control" id="save-file-name" type="text" name="file_name" placeholder="Dateiname" aria-describedby="save-file-name-append" required>
+							<div class="input-group-append input-group-addon">
+								<span class="input-group-text" id="save-file-name-append">.json</span>
 							</div>
 						</div>
-						<div class="modal-footer">
-							<button class="btn btn-default" data-dismiss="modal"><i class="fa fa-close" aria-hidden="true"></i><span>Abbrechen</span></button>
-							<button class="btn btn-primary" type="submit"><i class="fa fa-download" aria-hidden="true"></i><span>Herunterladen</span></button>
-						</div>
-					</form>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-default" data-dismiss="modal"><i class="fa fa-close" aria-hidden="true"></i><span>Abbrechen</span></button>
+						<a class="btn btn-primary" href="javascript:void(0);" data-fn="save-modal-confirm"><i class="fa fa-download" aria-hidden="true"></i><span>Herunterladen</span></a>
+					</div>
 				</div>
 			</div>
 		</div>

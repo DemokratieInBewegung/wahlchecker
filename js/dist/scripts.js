@@ -3321,15 +3321,6 @@ var MY_UTILS = (function( $ ) {
 
     // MENU FUNCTIONS
 
-	// download file
-	function _download( content, name, type ) {
-		var a = document.createElement( 'a' );
-		var file = new Blob( [content], { type: type } );
-		a.href = URL.createObjectURL( file );
-		a.download = name;
-		a.click();
-	}
-
 	// save current election config as json file
 	_saveCurrentElectionConfig = function() {
 		// save config if exists
@@ -3342,8 +3333,8 @@ var MY_UTILS = (function( $ ) {
 
 		if ( typeof currentElectionConfig !== 'undefined' ) {
 			var $saveModal = Utils.$targetElems.filter( '[data-tg="save-modal"]' );
-			var $form = $saveModal.find( 'form' );
-			var $fileNameInput = $form.find( 'input[name="file_name"]' );
+			var $fileNameInput = $saveModal.find( 'input[name="file_name"]' );
+			var $confirmButton = $saveModal.filter( Utils.$functionElems.find( '[data-fn="save-modal-confirm"]' ) );
 
 			var d = new Date,
 			dateString = [ 
@@ -3362,24 +3353,42 @@ var MY_UTILS = (function( $ ) {
 				} )
 			;
 
+			$.fn._addDownload = function( name ) {
+				var $a = $( this );
+				var content = JSON.stringify( currentElectionConfig );
+				var type = 'application/json';
+				var file = new Blob( [ content ], { type: type } );
+				$a
+					.attr( 'href', URL.createObjectURL( file ) )
+					.attr( 'download', $fileNameInput.val() + '.json' )
+				;
+			}
+
 			$saveModal.on( 'shown.bs.modal', ( function( fileNameInput ) {
+
+				$fileNameInput = $( fileNameInput );
+				$confirmButton = Utils.$functionElems.filter( '[data-fn="save-modal-confirm"]' );
+
+				$confirmButton._addDownload();
+
+				// update file name on change
+				$fileNameInput.on( 'change', function() {
+					$confirmButton._addDownload();
+				} );
+
 				setTimeout( function() {
-					$( fileNameInput ).focus();
-				}, 500 );
+					$fileNameInput.focus();
+				}, 550 );
+
 			} )( $fileNameInput ) );
 
-			$saveModal.modal( 'show' );
-
-			$form.one( 'submit', function( event, $saveModal ) {
-				console.log( 'submit' );
-				event.preventDefault();
-				var $form = $( this );
-				var fileName = $fileNameInput.val();
-				if ( fileName ) {
-					_download( JSON.stringify( currentElectionConfig ), fileName + '.json', 'application/json' );
-					Utils.$targetElems.filter( '[data-tg="save-modal"]' ).modal( 'hide' );
-				}
+			// prepare hide modal
+			$confirmButton.on( 'click', function() {
+				Utils.$targetElems.filter( '[data-tg="save-modal"]' ).modal( 'hide' );
 			} );
+
+			// show
+			$saveModal.modal( 'show' );
 		}
 		else {
 			// TODO: fallback message
