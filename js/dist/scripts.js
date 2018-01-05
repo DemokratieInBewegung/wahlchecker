@@ -477,6 +477,13 @@ var MY_UTILS = (function( $ ) {
 		]
 	};
 
+	// LOCAL STORAGE
+	var localStorageKey = 'currentElectionConfig';
+	// get current config from local storage if exists – set with: localStorage.setItem( localStorageKey, stringigiedContent );
+	if ( localStorage.getItem( localStorageKey ) ) {
+		currentElectionPreset = JSON.parse( localStorage.getItem( localStorageKey ) );
+	}
+
 	// TEST – TODO: remove
 	var currentElectionPreset;
 
@@ -2158,6 +2165,11 @@ var MY_UTILS = (function( $ ) {
 		// TEST: set test result
 		//currentElectionConfig = $.extend( {}, currentElectionConfig, testElectionResult );
 
+		if ( electionCalculationOutput ) {
+	    	// save in local storage
+	    	localStorage.setItem( localStorageKey, JSON.stringify( currentElectionConfig ) );
+		}
+
 		// if election result return true
 		return ( electionCalculationOutput ) ? true : false;
 	}
@@ -2249,6 +2261,9 @@ var MY_UTILS = (function( $ ) {
     	for ( var i = 0; i < deleteKeys.length; i++ ) {
     		delete currentElectionConfig[ deleteKeys[ i ] ];
     	}
+
+    	// save in local storage
+    	localStorage.setItem( localStorageKey, JSON.stringify( currentElectionConfig ) );
 
 		//console.log( 'config step 0 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2 ) );
 
@@ -2400,6 +2415,9 @@ var MY_UTILS = (function( $ ) {
 
         }
 
+    	// save in local storage
+    	localStorage.setItem( localStorageKey, JSON.stringify( currentElectionConfig ) );
+
 		//console.log( 'config step 1 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2 ) );
 
 	}
@@ -2473,6 +2491,9 @@ var MY_UTILS = (function( $ ) {
 	        }
 
         }
+
+    	// save in local storage
+    	localStorage.setItem( localStorageKey, JSON.stringify( currentElectionConfig ) );
 
 		//console.log( 'config step 2 (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2) );
 
@@ -3110,7 +3131,16 @@ var MY_UTILS = (function( $ ) {
 			_Nav.selectValues = _Nav._getSelectValues( _Nav.$select[ _Nav.currentStep ] );
 		}
 
-		// TODO BEFORE: allow execute election only if (minimum) first item has candidates
+		if ( _Nav.currentStep == 1 ) {
+			if ( _Nav.previousStep > _Nav.currentStep ) {
+				// going back
+				if ( _Nav.currentSelectValue[ _Nav.currentStep ] ) {
+					// if item != all, set to same value as step 2
+					_Nav._setItem( _Nav.currentSelectValue[ _Nav.currentStep + 1 ] );
+				}
+			}
+		}
+		
 		// if step == 2 set select to 1st item
 		if ( _Nav.currentStep == 2 ) {
 
@@ -3290,7 +3320,7 @@ var MY_UTILS = (function( $ ) {
 	    				var $showStepsButLast = $form .find( Utils.$targetElems.filter( '[data-tg="hide-last-item"]' ) );
 
 	    				// refresh navigator data
-	    				_Nav.currentSelectValue[ i ] = value;
+	    				_Nav.currentSelectValue[ _Nav.currentStep ] = value;
 	    				_Nav.currentItemCoordinates = value.split( inputIdentifierSeparator );
 
 	    				console.log( 'doing select change to: ' + value + ' – _Nav.currentSelectValue[ ' + _Nav.currentStep + ' ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] + ' – _Nav.currentItemCoordinates: ' + _Nav.currentItemCoordinates[ 0 ] + ' ' + _Nav.currentItemCoordinates[ 1 ] + ' ' + _Nav.currentItemCoordinates[ 2 ] );
@@ -3355,6 +3385,12 @@ var MY_UTILS = (function( $ ) {
 				}
 			}
 
+			if ( i > 0 ) {
+				// initial definition
+    			_Nav.currentSelectValue[ i ] = _Nav.$select[ i ].val();
+    			console.log( '_Nav.currentSelectValue[ ' + i + ' ]: ' + _Nav.currentSelectValue[ i ] );
+			}
+
     	}
 
     	// hide step sections but current
@@ -3375,6 +3411,29 @@ var MY_UTILS = (function( $ ) {
     }
 
     // MENU FUNCTIONS
+
+	// reset election
+	_resetElection = function( config ) {
+
+		// delete local storage
+		localStorage.removeItem( localStorageKey );
+
+		var newConfig = ( typeof config !== 'undefined' ) ? $.extend( {}, config ) : $.extend( {}, electionConfig );
+
+		if ( typeof config !== 'undefined' ) {
+			currentElectionPreset = $.extend( {}, newConfig );
+		}
+		else {
+			currentElectionPreset = undefined;
+		}
+		currentElectionConfig = $.extend( {}, newConfig );
+
+		_buildStep_0();
+		_Nav._reset();
+
+    	// hide results container
+    	Utils.$targetElems.filter( stepIdentifierPrefix + 3 + identifierSuffix ).hide();
+	}
 
 	// save current election config as json file
 	_saveCurrentElectionConfig = function() {
@@ -3491,17 +3550,20 @@ var MY_UTILS = (function( $ ) {
 			event.preventDefault();
 
 			if ( typeof result !== 'undefined' ) {
+				/*
 				// set both
 				currentElectionPreset = $.extend( {}, result );
 				currentElectionConfig = $.extend( {}, result );
-
-				Utils.$targetElems.filter( '[data-tg="load-modal"]' ).modal( 'hide' );
 
 				_buildStep_0();
 				_Nav._reset();
 
 		    	// hide results container
 		    	Utils.$targetElems.filter( stepIdentifierPrefix + 3 + identifierSuffix ).hide();
+		    	*/
+		    	_resetElection( result );
+
+				Utils.$targetElems.filter( '[data-tg="load-modal"]' ).modal( 'hide' );
 
 				// reset file input
 				$fileInput.val( '' );
@@ -3514,11 +3576,6 @@ var MY_UTILS = (function( $ ) {
 		Utils.$functionElems.filter( '#toggle-navbar-collapse' ).trigger( 'click' );
 		_loadCurrentElectionConfig();
 	} );
-
-	// reset election
-	_resetElection = function() {
-
-	}
 
 	// confirm modal
 	$.fn._confirmModal = function( options ) {
@@ -3604,10 +3661,24 @@ var MY_UTILS = (function( $ ) {
 			dismissButtonText: 'Nein, doch nicht',
 			confirmButtonText: 'Zurücksetzen',
 			confirmCallback: function() {
-				window.location.reload();
+				_resetElection();
+				Utils.$targetElems.filter( '[data-tg="confirm-modal"]' ).modal( 'hide' );
 			}
 		} );
 	} );
+
+	// SECURITY
+
+	// TODO: enable
+
+	// confirm before refresh or close (confirm close will not work in all browsers)
+	/*
+	window.addEventListener( 'beforeunload', function( event ) {
+		var confirmationMessage = 'Möchtest Du diese Seite wirklich verlassen?';
+		( event || window.event ).returnValue = confirmationMessage;
+		return confirmationMessage;
+	} );
+	*/
 
 	// INIT
 
