@@ -2632,17 +2632,17 @@
 
 	// vars
     var _Nav = {
+    	steps: 3,
     	currentStep: 0,
     	previousStep: null,
-    	currentItemCoordinates: null,
-    	steps: 3,
     	$electionStep: [],
     	$stepPrev: [],
     	$stepNext: [],
     	$select: [],
     	selectValues: [],
     	currentSelectValue: [],
-    	electionDoneSelectValue: null
+    	currentItemCoordinates: null,
+    	electionDoingSelectValue: null
     };
 
 	_Nav._getSelectValues = function( select ) {
@@ -2653,17 +2653,40 @@
 		return values;
 	}
 
-	_Nav._setItem = function( value, step ) {
+	_Nav._setItem = function( value, step, disableOptionsList ) {
+
 		var targetStep = ( typeof step === 'undefined' ) ? _Nav.currentStep : step;
-		//_Nav.currentSelectValue[ targetStep ] = value;
+		_Nav.currentSelectValue[ targetStep ] = value;
+
 		console.log( '_Nav._setItem (step: ' + targetStep + ') to: ' + value );
+
+		// enable if option disabled
+		_Nav.$select[ targetStep ]
+			.find( 'option[value="' + value + '"]' )
+				.removeAttr( 'disabled' )
+		;
+
+		// change select
 		_Nav.$select[ targetStep ]
 			.val( value )
 			.trigger( 'change' )
 		;
+
+		// disable options
+		if ( typeof disableOptionsList !== 'undefined' ) {
+			for ( var i = 0; i < disableOptionsList.length; i++ ) {
+				_Nav.$select[ targetStep ]
+					.find( 'option[value="' + disableOptionsList[ i ] + '"]' )
+						.removeAttr( 'disabled' )
+						.attr( 'disabled', '' )
+				;
+			}
+		}
 	}
 
 	_Nav._gotoStep = function( gotoStep, gotoSelectValue ) {
+
+		console.log( 'begin nav goto ' + gotoStep );
 
 		_Nav.previousStep = _Nav.currentStep;
 		_Nav.currentStep = gotoStep;
@@ -2692,17 +2715,32 @@
 			_Nav.selectValues = _Nav._getSelectValues( _Nav.$select[ _Nav.currentStep ] );
 		}
 
+		// if step == 0 (config election)
+		if ( _Nav.currentStep == 0 ) {
+			// forget done elections since config may change (candidates and votes will be kept as long as relatet config will be kept)
+			_Nav.electionDoingSelectValue = null;
+		}
+
+		// if step > 0
+		if ( _Nav.currentStep > 0 ) {
+			// select uptate only if null (else keep current value)
+			_Nav.currentSelectValue[ _Nav.currentStep ] = _Nav.$select[ _Nav.currentStep ].val();
+
+			console.log( '_Nav.currentSelectValue[ ' + _Nav.currentStep + ' ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] );
+		}
+
+		// if step == 1 (prepare election)
 		if ( _Nav.currentStep == 1 ) {
 			if ( _Nav.previousStep > _Nav.currentStep ) {
 				// going back
-				if ( _Nav.currentSelectValue[ _Nav.currentStep ] ) {
+				if ( _Nav.currentSelectValue[ _Nav.currentStep ] != '-1' ) {
 					// if item != all, set to same value as step 2
 					_Nav._setItem( _Nav.currentSelectValue[ _Nav.currentStep + 1 ] );
 				}
 			}
 		}
 		
-		// if step == 2 set select to 1st item
+		// if step == 2 (execute election) set select to 1st item
 		if ( _Nav.currentStep == 2 ) {
 
 			_checkForCandidates = function( value ) {
@@ -2724,47 +2762,76 @@
 				} );
 			}
 
-			_increaseSelectValue = function( value ) {
+			_increaseSelectValue = function( value, disableOptionsList ) {
+
+				// remember currently doing item
+				_Nav.electionDoingSelectValue = value;
+				console.log( '_Nav.electionDoingSelectValue: ' + _Nav.electionDoingSelectValue );
+
 				_Nav.currentSelectValue[ _Nav.currentStep ] = value;
 				console.log( '_increaseSelectValue: ' + value );
 				//  check for candidates before increase
 				if ( _checkForCandidates( value ) ) {
 					console.log( 'valid' );
-					_Nav._setItem( value );
+					_Nav._setItem( value, undefined, disableOptionsList );
+					return true;
 				}
 				else {
 					console.log( 'candidates missing, go back' );
 					_showMissingCandidatesDialog();
-					_Nav._gotoStep( _Nav.currentStep - 1, value );
+					_Nav._gotoStep( 1, value );
+					return false;
 				}
 
+			}
+
+			_getDisableOptionsList = function( startList ) {
+				var valueList = ( typeof startList !== 'undefined' ) ? startList : [];
+				var startI = ( _Nav.electionDoingSelectValue !== null ) ? _Nav.selectValues.indexOf( _Nav.electionDoingSelectValue ) + 1 : startList.length + 1;
+				console.log( 'DISABLE:' );
+				for ( var i = startI; i < _Nav.selectValues.length; i++ ) {
+					console.log( i + ': ' + _Nav.selectValues[ i ] );
+					valueList.push( _Nav.selectValues[ i ] );
+				}
+				return valueList;
 			}
 
 		    // check increase currentSelectValue
 
 		    //console.log( '_Nav.currentSelectValue[ _Nav.currentStep ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] );
-			//console.log( '_Nav.electionDoneSelectValue: ' + _Nav.electionDoneSelectValue );
 
 			// entering step 2
 			console.log( 'CHECK IF SET SELECT' );
 			if ( _Nav.previousStep != _Nav.currentStep ) {
 				console.log( _Nav.previousStep + ' != ' + _Nav.currentStep );
 				// check if select value
-				if ( ! _Nav.currentSelectValue[ _Nav.currentStep ] ) {
+				if ( 
+					_Nav.currentSelectValue[ _Nav.currentStep ] == '-1' 
+					&& _Nav.electionDoingSelectValue === null
+				){
 					console.log( 'increase & check' );
 					// increase item if exists (set to first)
 					var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( '-1' ) + 1 ) ];
-					_increaseSelectValue( value );
+					// TODO: calculate disable list
+					var disableOptionsList = ( _Nav.electionDoingSelectValue != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) ? _getDisableOptionsList( [ '-1' ] ) : undefined;
+					if ( ! _increaseSelectValue( value, disableOptionsList ) ) {
+						return false;
+					}
 				}
 				else {
 					// set select to current value since markup has been built new
-					var value = _Nav.currentSelectValue[ _Nav.currentStep ];
-					_Nav._setItem( value );
+					var value = _Nav.electionDoingSelectValue;
+					// TODO: calculate disable list
+					var disableOptionsList = ( _Nav.electionDoingSelectValue != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) ? _getDisableOptionsList( [ '-1' ] ) : undefined;
+					if ( ! _increaseSelectValue( value, disableOptionsList ) ) {
+						return false;
+					}
 					// check for candidates
 					if ( ! _checkForCandidates( value ) ) {
 						console.log( 'candidates missing, go back' );
 						_showMissingCandidatesDialog();
-						_Nav._gotoStep( _Nav.currentStep - 1, value );
+						_Nav._gotoStep( 1, value );
+						return false;
 					}
 				}
 			}
@@ -2772,16 +2839,17 @@
 			if ( _Nav.previousStep == _Nav.currentStep ) {
 				console.log( _Nav.previousStep + ' == ' + _Nav.currentStep );
 
-				// TODO: disable select 2, allow only 1st .. _Nav.electionDoneSelectValue
-				// remember latest successful item
-				_Nav.electionDoneSelectValue = _Nav.currentSelectValue[ _Nav.currentStep ];
+				// TODO: disable select 2, allow only 1st .. _Nav.electionDoingSelectValue, disallow -1 until _Nav.electionDoingSelectValue == last item
+
 
 				// increase item if exists
 				if ( _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 < _Nav.selectValues.length ) {
 					console.log( 'increase & check' );
 					// next item exists
 					var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 ) ];
-					_increaseSelectValue( value );
+					if ( ! _increaseSelectValue( value, disableOptionsList ) ) {
+						return false;
+					}
 				}
 				else {
 					// all elections done, show dialog
@@ -2796,6 +2864,12 @@
 						dismissButtonIconClass: 'fa fa-check',
 						dismissButtonText: 'Ok'
 					} );
+
+					// enable all select options
+					_Nav.$select[ _Nav.currentStep ]
+						.find( 'option[disabled]' )
+							.removeAttr( 'disabled' )
+					;
 				}
 			}
 
@@ -2812,7 +2886,7 @@
 			_Nav._setItem( gotoSelectValue );
 	    }
 
-		console.log( 'nav goto ' + _Nav.currentStep );
+		console.log( 'end nav goto ' + _Nav.currentStep );
 	}
 
 	_Nav._prev = function( gotoSelectValue ) {
@@ -2870,9 +2944,10 @@
 	    		if ( Utils.$functionElems.filter( stepSelectIdentifierPrefix + i + identifierSuffix ).length > 0 ) {
 	    			_Nav.$select[ i ] = Utils.$functionElems.filter( stepSelectIdentifierPrefix + i + identifierSuffix );
 
+					// select value initial definition
 	    			_Nav.currentSelectValue[ i ] = _Nav.$select[ i ].val();
 
-	    			console.log( '_Nav.currentSelectValue[ i ]: ' + _Nav.currentSelectValue[ i ] );
+	    			console.log( '_Nav.currentSelectValue[ ' + i + ' ]: ' + _Nav.currentSelectValue[ i ] );
 
 	    			_Nav.$select[ i ].on( 'change', function() {
 
@@ -2882,9 +2957,11 @@
 
 	    				// refresh navigator data
 	    				_Nav.currentSelectValue[ _Nav.currentStep ] = value;
-	    				_Nav.currentItemCoordinates = value.split( inputIdentifierSeparator );
+	    				if ( !! value ) {
+	    					_Nav.currentItemCoordinates = value.split( inputIdentifierSeparator );
+	    				}
 
-	    				console.log( 'doing select change to: ' + value + ' – _Nav.currentSelectValue[ ' + _Nav.currentStep + ' ]: ' + _Nav.currentSelectValue[ _Nav.currentStep ] + ' – _Nav.currentItemCoordinates: ' + _Nav.currentItemCoordinates[ 0 ] + ' ' + _Nav.currentItemCoordinates[ 1 ] + ' ' + _Nav.currentItemCoordinates[ 2 ] );
+	    				console.log( 'doing select change to: ' + value + ' – _Nav.currentSelectValue[ ' + _Nav.currentStep + ' ]: ' + ( ( _Nav.currentSelectValue != null  ) ? _Nav.currentSelectValue[ _Nav.currentStep ] : undefined ) + ' – _Nav.currentItemCoordinates: ' + _Nav.currentItemCoordinates[ 0 ] + ' ' + _Nav.currentItemCoordinates[ 1 ] + ' ' + _Nav.currentItemCoordinates[ 2 ] );
 
 	    				if ( value != -1 ) {
 		    				// hide all
@@ -2946,12 +3023,6 @@
 				}
 			}
 
-			if ( i > 0 ) {
-				// initial definition
-    			_Nav.currentSelectValue[ i ] = _Nav.$select[ i ].val();
-    			console.log( '_Nav.currentSelectValue[ ' + i + ' ]: ' + _Nav.currentSelectValue[ i ] );
-			}
-
     	}
 
     	// hide step sections but current
@@ -2965,7 +3036,7 @@
     	_Nav.previousStep = null;
     	_Nav.selectValues = [];
     	_Nav.currentSelectValue = [];
-    	_Nav.electionDoneSelectValue = null;
+    	_Nav.electionDoingSelectValue = null;
 
     	_Nav._gotoStep( _Nav.currentStep );
 
