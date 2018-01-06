@@ -2790,7 +2790,7 @@
 					$confirmModal._confirmModal( {
 						header: 'Fertig',
 						headerClass: 'modal-title text-success',
-						body: '<p>Es wurden alle Wahlgänge durchgeführt.<p><p>Falls irgendwo Korrekturen nötig sein sollten, einfach zurück gehen, korrigieren und Wahlen fortsetzen bis zu dieser Meldung.</p>',
+						body: '<p>Es wurden alle Wahlgänge durchgeführt.<p><p class="mb-0">Falls irgendwo Korrekturen nötig sein sollten, einfach zurück gehen, korrigieren und Wahlen fortsetzen bis zu dieser Meldung.</p>',
 						confirmButtonHide: true,
 						dismissButtonClass: 'btn btn-success',
 						dismissButtonIconClass: 'fa fa-check',
@@ -2973,6 +2973,29 @@
 
     // MENU FUNCTIONS
 
+	// save election in local storage
+	_saveLocal = function( triggerElem ) {
+		console.log( 'save' );
+		var $triggerElem = $( triggerElem );
+		var successClass = 'bg-success text-white';
+		
+		Utils.$functionElems.filter( stepFormIdentifierPrefix + _Nav.currentStep + identifierSuffix )[ ( '_getElectionCurrentConfig_' + _Nav.currentStep ) ]();
+		
+		if ( localStorage.getItem( localStorageKey ) ) {
+			$triggerElem
+				.addClass( successClass )
+				.delay( 300 ).queue( function() {
+					$( this ).removeClass( successClass ).dequeue();
+					Utils.$functionElems.filter( '#toggle-navbar-collapse' ).trigger( 'click' );
+				} )
+			;
+		}
+	}
+	// init
+	Utils.$functionElems.filter( '[data-fn="config-save"]' ).on( 'click', function() {
+		_saveLocal( this );
+	} );
+
 	// reset election
 	_resetElection = function( config ) {
 
@@ -2997,7 +3020,7 @@
 	}
 
 	// save current election config as json file
-	_saveCurrentElectionConfig = function() {
+	_downloadCurrentElectionConfig = function() {
 		// save config if exists
 
 		// get current config of current step
@@ -3072,7 +3095,7 @@
 	// init
 	Utils.$functionElems.filter( '[data-fn="config-download"]' ).on( 'click', function() {
 		Utils.$functionElems.filter( '#toggle-navbar-collapse' ).trigger( 'click' );
-		_saveCurrentElectionConfig();
+		_downloadCurrentElectionConfig();
 	} );
 
 	// load election config from json file
