@@ -2133,9 +2133,16 @@
 			    			.show()
 						;
 
-						// append subitem
-						$subitemClone.appendTo( $subitemAppend );
+						// empty
+						if ( k == 0 && candidateName != '' ) {
+							$subitemAppend.empty();
+						}
 
+						// append subitem
+						if ( candidateName != '' ) {
+							$subitemClone.appendTo( $subitemAppend );
+						}
+						
 	        		}
 
 	        	}
@@ -2706,11 +2713,8 @@
 
 		}
 
-		// get select values if empty && step contains select 
-		if ( 
-			_Nav.selectValues.length == 0 
-			&& ( _Nav.currentStep == 1 || _Nav.currentStep == 2 )
-		) {
+		// get select values (always refresh since may have changed in step 0)
+		if ( _Nav.currentStep == 1 ) {
 			// iterate each selection
 			_Nav.selectValues = _Nav._getSelectValues( _Nav.$select[ _Nav.currentStep ] );
 		}
@@ -2731,6 +2735,30 @@
 
 		// if step == 1 (prepare election)
 		if ( _Nav.currentStep == 1 ) {
+
+			_showMissingElectionsDialog = function() {
+				var $confirmModal = Utils.$targetElems.filter( '[data-tg="confirm-modal"]' );
+				$confirmModal._confirmModal( {
+					header: 'Hinweis',
+					headerClass: 'modal-title',
+					body: 'Bitte wähle mindestens eine Wahl aus.',
+					confirmButtonHide: true,
+					dismissButtonClass: 'btn btn-primary',
+					dismissButtonIconClass: 'fa fa-check',
+					dismissButtonText: 'Ok'
+				} );
+			}
+
+			if ( _Nav.previousStep < _Nav.currentStep ) {
+				console.log( 'going forward: ' + typeof currentElectionConfig );
+				// going forward
+				if ( JSON.stringify( currentElectionConfig ) === '{}' ) {
+					_showMissingElectionsDialog();
+					_Nav._gotoStep( 0 );
+					return false;
+				}
+			}
+
 			if ( _Nav.previousStep > _Nav.currentStep ) {
 				// going back
 				if ( _Nav.currentSelectValue[ _Nav.currentStep ] != '-1' ) {
@@ -2738,15 +2766,22 @@
 					_Nav._setItem( _Nav.currentSelectValue[ _Nav.currentStep + 1 ] );
 				}
 			}
+
 		}
 		
 		// if step == 2 (execute election) set select to 1st item
 		if ( _Nav.currentStep == 2 ) {
 
 			_checkForCandidates = function( value ) {
-				var selectCoordinates = value.split( inputIdentifierSeparator );
-				var check = _checkElectionConfigCandidatesOrVotes( selectCoordinates[ 0 ], selectCoordinates[ 1 ], selectCoordinates[ 2 ] );
-				return check[ 0 ];
+				// TEST –  && _Nav.selectValues.indexOf( value ) >= 0
+				if ( typeof value !== 'undefined' ) {
+					var selectCoordinates = value.split( inputIdentifierSeparator );
+					var check = _checkElectionConfigCandidatesOrVotes( selectCoordinates[ 0 ], selectCoordinates[ 1 ], selectCoordinates[ 2 ] );
+					return check[ 0 ];
+				}
+				else {
+					return false;
+				}
 			}
 
 			_showMissingCandidatesDialog = function() {
@@ -2811,6 +2846,13 @@
 				){
 					console.log( 'increase & check' );
 					// increase item if exists (set to first)
+
+					// FIX?
+					/*if (  ) {
+
+					}
+					_Nav.selectValues = _Nav._getSelectValues( _Nav.$select[ 1 ] );*/
+
 					var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( '-1' ) + 1 ) ];
 					// TODO: calculate disable list
 					var disableOptionsList = ( _Nav.electionDoingSelectValue != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) ? _getDisableOptionsList( [ '-1' ] ) : undefined;
