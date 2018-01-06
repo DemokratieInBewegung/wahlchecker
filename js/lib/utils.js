@@ -1,4 +1,4 @@
-var MY_UTILS = (function( $ ) {
+var MY_UTILS = ( function( $ ) {
 
     var Utils = {
         $document:      $( document ),
@@ -222,4 +222,4 @@ var MY_UTILS = (function( $ ) {
     // /get options from attribute
 
     return Utils;
-})( jQuery );
+} )( jQuery );

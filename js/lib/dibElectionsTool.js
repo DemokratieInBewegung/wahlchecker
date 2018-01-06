@@ -1,6 +1,6 @@
 // dib elections tool
 
-( function( $, Utils ) {
+( function( $, Utils, DibElectionCalculator ) {
 
 	var electionConfig = {
 		"Vorstand": [
@@ -1529,8 +1529,6 @@
 	_calculateElectionResult = function( input ) {
 		
 		var output;
-
-		//console.log( '_calculateElectionResult – input: ' + JSON.stringify( input, null, 2 ) );
 		
 		// do magic here...
 
@@ -1643,7 +1641,7 @@
 
 					}
 
-					// call _calculateElectionResult (one time)
+					// call DibElectionCalculator.getResult (one time)
 
 					// if all votes valid call election tool
 					if ( voteFound && ! missingVoteFound ) {
@@ -1654,7 +1652,7 @@
 						electionCalculationInput.candidates = currentElectionConfig[ key ][ i ].candidates;
 
 						// call election tool
-						var electionCalculationOutput = _calculateElectionResult( electionCalculationInput );
+						var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 						if ( electionCalculationOutput ) {
 							// copy results into currentElectionConfig
 							currentElectionConfig[ key ][ i ].results = electionCalculationOutput;
@@ -1693,7 +1691,7 @@
 
 						}
 
-						// call _calculateElectionResult each single election
+						// call DibElectionCalculator.getResult each single election
 
 						// if all votes valid call election tool
 						if ( voteFound && ! missingVoteFound ) {
@@ -1707,7 +1705,7 @@
 							electionCalculationInput.candidates = currentElectionConfig[ key ][ i ].candidates[ j ];
 
 							// call election tool
-							var electionCalculationOutput = _calculateElectionResult( electionCalculationInput );
+							var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 							if ( electionCalculationOutput ) {
 								// copy results into currentElectionConfig
 								currentElectionConfig[ key ][ i ].results.push( electionCalculationOutput[ 0 ] );
@@ -3385,4 +3383,4 @@
     	_Nav._init();
     }
 
-} )( jQuery, MY_UTILS );
+} )( jQuery, MY_UTILS, DIB_ELECTION_CALCULATOR );

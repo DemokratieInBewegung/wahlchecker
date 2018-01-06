@@ -98,7 +98,8 @@ gulp.task( 'js:vendor', function() {
 gulp.task( 'js:concat', function() {
     return gulp.src( [
         JS_SRC_PATH + '/lib/utils.js',
-        JS_SRC_PATH + '/lib/**/!(utils).js',
+        JS_SRC_PATH + '/lib/dibElectionCalculator.js',
+        JS_SRC_PATH + '/lib/**/!(utils, dibElectionCalculator).js',
         JS_SRC_PATH + '/init.js'
     ] )
     .pipe( sourcemaps.init() )
