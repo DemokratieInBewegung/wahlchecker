@@ -233,34 +233,392 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
             var output;
 
             // TODO: do magic here
+/*
 
+(FALL 1: gemeinsame Wahl -> "joint" == true bzw. typeof "current" === 'string' )
+
+input = {
+    "structure": [
+        {
+            "name": "Vorsitzende",
+            "count": 2,
+            "joint": true
+        },
+        {
+            "name": "Schatzmeister*in",
+            "count": 1
+        },
+        {
+            "name": "weitere Mitglieder",
+            "count": 2,
+            "joint": true,
+            "overall": true
+        }
+    ],
+    "current": "weitere Mitglieder",
+    "previous": [
+        {
+            "candidate": {
+                "name": "Lina Limone",
+                "female": true,
+                "diverse": false
+            }
+        },
+        {
+            "candidate": {
+                "name": "Manfred Mango",
+                "female": false,
+                "diverse": false
+            }
+        },
+        {
+            "candidate": {
+                "name": "Melly Melone",
+                "female": true,
+                "diverse": false
+            }
+        }
+    ],
+    "candidates": [
+        {
+            "candidate": {
+                "name": "Maria Maracuja",
+                "female": true,
+                "diverse": true
+            },
+            "yes": 10,
+            "no": 0
+        },
+        {
+            "candidate": {
+                "name": "Bernard Banane",
+                "female": false,
+                "diverse": false
+            },
+            "yes": 12,
+            "no": 1
+        },
+        {
+            "candidate": {
+                "name": "Kira Kirsch-Banane",
+                "female": true,
+                "diverse": false
+            },
+            "yes": 18,
+            "no": 2
+        },
+        {
+            "candidate": {
+                "name": "Alfred Apfel",
+                "female": false,
+                "diverse": true
+            },
+            "yes": 15,
+            "no": 3
+        },
+        {
+            "candidate": {
+                "name": "Anna Ananas",
+                "female": true,
+                "diverse": true
+            },
+            "yes": 12,
+            "no": 4
+        },
+        {
+            "candidate": {
+                "name": "Cora Cocos",
+                "female": true,
+                "diverse": false
+            },
+            "yes": 7,
+            "no": 1
+        }
+    ]
+}
+
+
+(FALL 2: einzelne Wahl -> "joint" != true bzw. typeof "current" === 'object')
+
+input = {
+    "structure": [
+        {
+            "name": "Vorsitzende",
+            "count": 2,
+            "joint": false
+        },
+        {
+            "name": "Schatzmeister*in",
+            "count": 1
+        },
+        {
+            "name": "weitere Mitglieder",
+            "count": 2,
+            "joint": false,
+            "overall": true
+        }
+    ],
+    "current": [
+        "weitere Mitglieder",
+        0
+    ],
+    "previous": [
+        {
+            "candidate": {
+                "name": "Lina Limone",
+                "female": true,
+                "diverse": false
+            }
+        },
+        {
+            "candidate": {
+                "name": "Manfred Mango",
+                "female": false,
+                "diverse": false
+            }
+        },
+        {
+            "candidate": {
+                "name": "Melly Melone",
+                "female": true,
+                "diverse": false
+            }
+        }
+    ],
+    "candidates": [
+        {
+            "candidate": {
+                "name": "Maria Maracuja",
+                "female": true,
+                "diverse": true
+            },
+            "yes": 10,
+            "no": 0
+        },
+        {
+            "candidate": {
+                "name": "Bernard Banane",
+                "female": false,
+                "diverse": false
+            },
+            "yes": 12,
+            "no": 1
+        },
+        {
+            "candidate": {
+                "name": "Kira Kirsch-Banane",
+                "female": true,
+                "diverse": false
+            },
+            "yes": 18,
+            "no": 2
+        },
+        {
+            "candidate": {
+                "name": "Alfred Apfel",
+                "female": false,
+                "diverse": true
+            },
+            "yes": 15,
+            "no": 3
+        },
+        {
+            "candidate": {
+                "name": "Anna Ananas",
+                "female": true,
+                "diverse": true
+            },
+            "yes": 12,
+            "no": 4
+        },
+        {
+            "candidate": {
+                "name": "Cora Cocos",
+                "female": true,
+                "diverse": false
+            },
+            "yes": 7,
+            "no": 1
+        }
+    ]
+}
+
+
+output = {
+    "candidates": [
+        {
+            "candidate": {
+                "name": "Holly Holunder",
+                "female": true,
+                "diverse": false
+            }
+        },
+        {
+            "candidate": {
+                "name": "Hila Himbeere",
+                "female": true,
+                "diverse": true
+            }
+        }
+    ],
+    "explanation": [
+        {
+            "headline": "Vielfaltsquote erfüllen",
+            "content": [
+                {
+                    "headline": "",
+                    "type": "text",
+                    "items": [
+                        {
+                            "item": "Die aktuelle Auswahl erfüllt nicht die Vielfaltsquote."
+                        },
+                        {
+                            "item": "Penelope Pineapple wird durch Olivia Orange ersetzt."
+                        }
+                    ]
+                },
+                {
+                    "headline": "Neue Auswahl",
+                    "type": "list"
+                    "items": [
+                        {
+                            "item": "Lina Limone",
+                            "selected": true
+                        },
+                        {
+                            "item": "Manfred Mango",
+                            "selected": false
+                        },
+                        {
+                            "item": "Penelope Pineapple",
+                            "selected": true
+                        },
+                        {
+                            "item": "Olivia Orange",
+                            "selected": true
+                        }
+                    ]
+                }
+            ]  
+        }
+    ]
+}
+*/
 
 
             // TEST – TODO: delete
-            output = ( typeof input.current === 'string' ) ?     [
-                {
-                    "candidate": {
-                        "name": "Kira Kirsch-Banane",
-                        "female": true,
-                        "diverse": false
+            output = ( typeof input.current === 'string' ) ? {
+                "candidates": [
+                    {
+                        "candidate": {
+                            "name": "Kira Kirsch-Banane",
+                            "female": true,
+                            "diverse": false
+                        }
+                    },
+                    {
+                        "candidate": {
+                            "name": "Alfred Apfel",
+                            "female": false,
+                            "diverse": true
+                        }
                     }
-                },
-                {
-                    "candidate": {
-                        "name": "Alfred Apfel",
-                        "female": false,
-                        "diverse": true
+                ],
+                "explanation": [
+                    {
+                        "headline": "Vielfaltsquote erfüllen",
+                        "content": [
+                            {
+                                "headline": "",
+                                "type": "text",
+                                "items": [
+                                    {
+                                        "item": "Die aktuelle Auswahl erfüllt nicht die Vielfaltsquote."
+                                    },
+                                    {
+                                        "item": "Penelope Pineapple wird durch Olivia Orange ersetzt."
+                                    }
+                                ]
+                            },
+                            {
+                                "headline": "Neue Auswahl",
+                                "type": "list",
+                                "items": [
+                                    {
+                                        "item": "Lina Limone",
+                                        "selected": true
+                                    },
+                                    {
+                                        "item": "Manfred Mango",
+                                        "selected": false
+                                    },
+                                    {
+                                        "item": "Penelope Pineapple",
+                                        "selected": true
+                                    },
+                                    {
+                                        "item": "Olivia Orange",
+                                        "selected": true
+                                    }
+                                ]
+                            }
+                        ]  
                     }
-                }
-            ] : [
-                {
-                    "candidate": {
-                        "name": "Lina Limone",
-                        "female": true,
-                        "diverse": false
+                ]
+            }
+            : 
+            {
+                "candidates": [
+                    {
+                        "candidate": {
+                            "name": "Lina Limone",
+                            "female": true,
+                            "diverse": false
+                        }
                     }
-                }
-            ];
+                ],
+                "explanation": [
+                    {
+                        "headline": "Vielfaltsquote erfüllen",
+                        "content": [
+                            {
+                                "headline": "",
+                                "type": "text",
+                                "items": [
+                                    {
+                                        "item": "Die aktuelle Auswahl erfüllt nicht die Vielfaltsquote."
+                                    },
+                                    {
+                                        "item": "Penelope Pineapple wird durch Olivia Orange ersetzt."
+                                    }
+                                ]
+                            },
+                            {
+                                "headline": "Neue Auswahl",
+                                "type": "list",
+                                "items": [
+                                    {
+                                        "item": "Lina Limone",
+                                        "selected": true
+                                    },
+                                    {
+                                        "item": "Manfred Mango",
+                                        "selected": false
+                                    },
+                                    {
+                                        "item": "Penelope Pineapple",
+                                        "selected": true
+                                    },
+                                    {
+                                        "item": "Olivia Orange",
+                                        "selected": true
+                                    }
+                                ]
+                            }
+                        ]  
+                    }
+                ]
+            };
             // /TEST
 
         
@@ -1260,7 +1618,7 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 						}
 					}
 				],
-				"results": [
+				"resultsBefore": [
 					{
 						"candidate": {
 							"name": "Holly Holunder",
@@ -1275,7 +1633,66 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 							"diverse": true
 						}
 					}
-				]
+				],
+				"results": {
+					"candidates": [
+						{
+							"candidate": {
+								"name": "Holly Holunder",
+								"female": true,
+								"diverse": false
+							}
+						},
+						{
+							"candidate": {
+								"name": "Hila Himbeere",
+								"female": true,
+								"diverse": true
+							}
+						}
+					],
+				    "explanation": [
+				        {
+				            "headline": "Vielfaltsquote erfüllen",
+				            "content": [
+				                {
+				                    "headline": "",
+				                    "type": "text",
+				                    "items": [
+				                        {
+				                            "item": "Die aktuelle Auswahl erfüllt nicht die Vielfaltsquote."
+				                        },
+				                        {
+				                            "item": "Penelope Pineapple wird durch Olivia Orange ersetzt."
+				                        }
+				                    ]
+				                },
+				                {
+				                    "headline": "Neue Auswahl",
+				                    "type": "list"
+				                    "items": [
+				                        {
+				                            "item": "Lina Limone",
+				                            "selected": true
+				                        },
+				                        {
+				                            "item": "Manfred Mango",
+				                            "selected": false
+				                        },
+				                        {
+				                            "item": "Penelope Pineapple",
+				                            "selected": true
+				                        },
+				                        {
+				                            "item": "Olivia Orange",
+				                            "selected": true
+				                        }
+				                    ]
+				                }
+				            ]  
+				        }
+				    ]
+				}
 			}
 		]
 	};
@@ -1781,286 +2198,6 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 		return matchingIndexes;
 	}
 
-	/*
-
-	@Felix: 
-
-	- in die folgende Funktion kann die Berechnung der Ergebnisse eingefügt werden
-	- "explanation" habe ich erstmal weggelassen, da die Ergebnisse von der Oberlfäche ohnehin angezeigt werden, und ich gerne Daten und Oberflächenstruktur voneinander trennen würde
-
-
-	(FALL 1: gemeinsame Wahl -> "joint" == true bzw. typeof "current" === 'string' )
-
-	input = {
-		"structure": [
-			{
-				"name": "Vorsitzende",
-				"count": 2,
-				"joint": true
-			},
-			{
-				"name": "Schatzmeister*in",
-				"count": 1
-			},
-			{
-				"name": "weitere Mitglieder",
-				"count": 2,
-				"joint": true,
-				"overall": true
-			}
-		],
-		"current": "weitere Mitglieder",
-		"previous": [
-			{
-				"candidate": {
-					"name": "Lina Limone",
-					"female": true,
-					"diverse": false
-				}
-			},
-			{
-				"candidate": {
-					"name": "Manfred Mango",
-					"female": false,
-					"diverse": false
-				}
-			},
-			{
-				"candidate": {
-					"name": "Melly Melone",
-					"female": true,
-					"diverse": false
-				}
-			}
-		],
-		"candidates": [
-			{
-				"candidate": {
-					"name": "Maria Maracuja",
-					"female": true,
-					"diverse": true
-				},
-				"yes": 10,
-				"no": 0
-			},
-			{
-				"candidate": {
-					"name": "Bernard Banane",
-					"female": false,
-					"diverse": false
-				},
-				"yes": 12,
-				"no": 1
-			},
-			{
-				"candidate": {
-					"name": "Kira Kirsch-Banane",
-					"female": true,
-					"diverse": false
-				},
-				"yes": 18,
-				"no": 2
-			},
-			{
-				"candidate": {
-					"name": "Alfred Apfel",
-					"female": false,
-					"diverse": true
-				},
-				"yes": 15,
-				"no": 3
-			},
-			{
-				"candidate": {
-					"name": "Anna Ananas",
-					"female": true,
-					"diverse": true
-				},
-				"yes": 12,
-				"no": 4
-			},
-			{
-				"candidate": {
-					"name": "Cora Cocos",
-					"female": true,
-					"diverse": false
-				},
-				"yes": 7,
-				"no": 1
-			}
-		]
-	}
-
-	(FALL 2: einzelne Wahl -> "joint" != true bzw. typeof "current" === 'object')
-
-	input = {
-		"structure": [
-			{
-				"name": "Vorsitzende",
-				"count": 2,
-				"joint": false
-			},
-			{
-				"name": "Schatzmeister*in",
-				"count": 1
-			},
-			{
-				"name": "weitere Mitglieder",
-				"count": 2,
-				"joint": false,
-				"overall": true
-			}
-		],
-		"current": [
-			"weitere Mitglieder",
-			0
-		],
-		"previous": [
-			{
-				"candidate": {
-					"name": "Lina Limone",
-					"female": true,
-					"diverse": false
-				}
-			},
-			{
-				"candidate": {
-					"name": "Manfred Mango",
-					"female": false,
-					"diverse": false
-				}
-			},
-			{
-				"candidate": {
-					"name": "Melly Melone",
-					"female": true,
-					"diverse": false
-				}
-			}
-		],
-		"candidates": [
-			{
-				"candidate": {
-					"name": "Maria Maracuja",
-					"female": true,
-					"diverse": true
-				},
-				"yes": 10,
-				"no": 0
-			},
-			{
-				"candidate": {
-					"name": "Bernard Banane",
-					"female": false,
-					"diverse": false
-				},
-				"yes": 12,
-				"no": 1
-			},
-			{
-				"candidate": {
-					"name": "Kira Kirsch-Banane",
-					"female": true,
-					"diverse": false
-				},
-				"yes": 18,
-				"no": 2
-			},
-			{
-				"candidate": {
-					"name": "Alfred Apfel",
-					"female": false,
-					"diverse": true
-				},
-				"yes": 15,
-				"no": 3
-			},
-			{
-				"candidate": {
-					"name": "Anna Ananas",
-					"female": true,
-					"diverse": true
-				},
-				"yes": 12,
-				"no": 4
-			},
-			{
-				"candidate": {
-					"name": "Cora Cocos",
-					"female": true,
-					"diverse": false
-				},
-				"yes": 7,
-				"no": 1
-			}
-		]
-	}
-
-	output = [
-		{
-			"candidate": {
-				"name": "Kira Kirsch-Banane",
-				"female": true,
-				"diverse": false
-			}
-		},
-		{
-			"candidate": {
-				"name": "Alfred Apfel",
-				"female": false,
-				"diverse": true
-			}
-		},
-		{
-			"candidate": {
-				"name": "Anna Ananas",
-				"female": true,
-				"diverse": true
-			}
-		}
-	]
-
-	*/
-	_calculateElectionResult = function( input ) {
-		
-		var output;
-		
-		// do magic here...
-
-
-
-		// TEST – TODO: delete
-		output = ( typeof input.current === 'string' ) ?	 [
-			{
-				"candidate": {
-					"name": "Kira Kirsch-Banane",
-					"female": true,
-					"diverse": false
-				}
-			},
-			{
-				"candidate": {
-					"name": "Alfred Apfel",
-					"female": false,
-					"diverse": true
-				}
-			}
-		] : [
-			{
-				"candidate": {
-					"name": "Lina Limone",
-					"female": true,
-					"diverse": false
-				}
-			}
-		];
-		// /TEST
-
-
-
-		return output;
-	}
-
 	_getElectionResult = function() {
 
 		// election groups
@@ -2129,7 +2266,7 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 							&& typeof currentElectionConfig[ key ][ i ].candidates[ k ].no !== 'undefined'
 							&& currentElectionConfig[ key ][ i ].candidates[ k ].yes > 0
 						) {
-							// votes exist, minimum one yes vote is > 0 (since ui saves '0' if not filled)
+							// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
 							voteFound = true;
 						}
 						else {
@@ -2152,11 +2289,6 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 						var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 						if ( electionCalculationOutput ) {
 							// copy results into currentElectionConfig
-
-							//TODO (@Felix?): new structure after adding explanation to election result output
-							/*
-								currentElectionConfig[ key ][ i ].results = electionCalculationOutput.candidates;
-							*/
 							currentElectionConfig[ key ][ i ].results = electionCalculationOutput;
 						}
 
@@ -2186,7 +2318,7 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 								&& typeof currentElectionConfig[ key ][ i ].candidates[ j ][ k ].no !== 'undefined'
 								&& currentElectionConfig[ key ][ i ].candidates[ j ][ k ].yes > 0
 							) {
-								// votes exist, minimum one yes vote is > 0 (since ui saves '0' if not filled)
+								// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
 								voteFound = true;
 							}
 							else {
@@ -2212,14 +2344,8 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 							var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 							if ( electionCalculationOutput ) {
 								// copy results into currentElectionConfig
-
-								//TODO (@Felix?): new structure after adding explanation to election result output
-								/*
-									currentElectionConfig[ key ][ i ].results.push( electionCalculationOutput.candidates[ 0 ] );
-									electionCalculationInput.previous.push( electionCalculationOutput.candidates[ 0 ] );
-								*/
-								currentElectionConfig[ key ][ i ].results.push( electionCalculationOutput[ 0 ] );
-								electionCalculationInput.previous.push( electionCalculationOutput[ 0 ] );
+								currentElectionConfig[ key ][ i ].results.candidates.push( electionCalculationOutput.candidates[ 0 ] );
+								electionCalculationInput.previous.push( electionCalculationOutput.candidates[ 0 ] );
 							}
 
 						}
@@ -2230,9 +2356,6 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 			}
 
 		}
-
-		// TEST: set test result
-		//currentElectionConfig = $.extend( {}, currentElectionConfig, testElectionResult );
 
 		if ( electionCalculationOutput ) {
 	    	// save in local storage
@@ -2622,16 +2745,20 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 				;
 
 	        	// check if results
-	        	if ( typeof currentElectionConfig[ key ][ i ].results !== 'undefined' && currentElectionConfig[ key ][ i ].results.length > 0 ) {
+	        	if ( 
+	        		typeof currentElectionConfig[ key ][ i ].results !== 'undefined' 
+	        		&& typeof currentElectionConfig[ key ][ i ].results.candidates !== 'undefined' 
+	        		&& currentElectionConfig[ key ][ i ].results.candidates.length > 0 
+	        	) {
 	        		
 					var $subitemAppend = $subitemgroupClone.find( subitemAppendIdentifierPrefix + step + identifierSuffix );
 
-	        		for ( var k = 0; k < currentElectionConfig[ key ][ i ].results.length; k++ ) {
+	        		for ( var k = 0; k < currentElectionConfig[ key ][ i ].results.candidates.length; k++ ) {
 
 		        		// clone subitems
 						var $subitemClone = $subitemTemplate.clone();
 
-			    		var candidateName = currentElectionConfig[ key ][ i ].results[ k ].candidate.name || '';
+			    		var candidateName = currentElectionConfig[ key ][ i ].results.candidates[ k ].candidate.name || '';
 
 			    		$subitemClone
 			    			._replaceTemplatePlaceholders( [ 
