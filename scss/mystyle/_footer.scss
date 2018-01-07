@@ -4,7 +4,8 @@
 .page-footer {
 	margin-top: $footer-margin-top;
 	padding-bottom: 1.5em;
-	background-color: $mystyle-color-greyscale-1;
+	background-color: $mystyle-footer-bg-color;
+	box-shadow: 0 2500px 0 2500px $mystyle-footer-bg-color;
 	
 	a[href]:not([class*="color-"]) {
 		color: inherit;
@@ -17,12 +18,5 @@
 
 	&:hover {
 		filter: grayscale(0%) opacity(100%);
-	}
-}
-
-.social-list {
-	a[href] {
-		color: $mystyle-color-greyscale-4;
-		transition: $transition-standard;
 	}
 }

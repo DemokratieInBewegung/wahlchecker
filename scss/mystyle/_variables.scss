@@ -51,17 +51,6 @@ $mystyle-color-greyscale-7:       #333333 !default;
 $mystyle-color-greyscale-8:       $mystyle-color-black !default;
 
 
-// country flags
-
-$color-flag-de-black:            #000 !default;
-$color-flag-de-red:              #f00 !default;
-$color-flag-de-yellow:           #fc0 !default;
-
-$color-flag-uk-blue:             #00247D !default;
-$color-flag-uk-white:            #fff !default;
-$color-flag-uk-red:              #CF142B !default;
-
-
 // special design colors
 
 $hight-contrast-ci-color:        $mystyle-color-red !default;
@@ -135,7 +124,6 @@ $mystyle-border-color:          rgba(0, 0, 0, 0.1) !default;
 
 
 
-//XX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX
 
 
 // OVERRIDE BOOTSTRAP STANDARDS
@@ -175,7 +163,11 @@ $breadcrumb-item-padding:        0.25rem !default;
 
 
 
-//XX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX    XXXX
+
+// FOOTER
+
+$mystyle-footer-bg-color:		$mystyle-color-greyscale-1 !default;
+
 
 
 // NAV (MYSTYLE NAVBAR)
@@ -340,18 +332,6 @@ $play-button-color-hover:        $mystyle-color-white !default;
 $play-button-shadow-size:        0.25em !default;
 $play-button-shadow-color:       rgba($mystyle-color-white, 0.25) !default;
 $play-button-transition:         $transition-standard !default;
-
-
-// SOCIAL MEDIA
-
-$social-media-color-prefix:         "color-" !default;
-$social-media-color-hover-prefix:   "color-hover-" !default;
-$social-media-colors: (
-	facebook: "#3b5998", 
-	twitter: "#00aced", 
-	xing: "#B0D400", 
-	rss: "#FB9E3A"
-) !default;
 
 
 

@@ -161,7 +161,7 @@
 
 							<div class="card mb-3" style="display: none;" data-tg="election-item-template-0">
 								<div class="card-body p-0">
-									<div class="p-3">
+									<div class="check-accordion-header p-3">
 										<label class="form-check-label">
 											<input class="form-check-input" id="election-check-{{ index }}" type="checkbox" aria-controls="#check-accordion-{{ index }}" aria-expanded="false" data-g-fn="accordion-trigger">
 											{{ title }}
@@ -169,12 +169,12 @@
 									</div>
 									<div style="display: none;" id="check-accordion-{{ index }}">
 										<div class="px-3">
-											<table class="table table-striped table-sm table-responsive-md setup-election-table">
+											<table class="table table-striped table-sm table-responsive-md election-table setup-election-table">
 												<thead>
 													<tr>
-														<th scope="col"><i class="fa fa-hashtag" aria-hidden="true"></i> <span>Anzahl</span></th>
-														<th scope="col"><i class="fa fa-briefcase" aria-hidden="true"></i> <span>Funktion</span></th>
-														<th scope="col"><i class="fa fa-chain" aria-hidden="true"></i> <span>gemeinsame Wahl</span></th>
+														<th class="number-th" scope="col"><i class="fa fa-hashtag" aria-hidden="true"></i> <span>Anzahl</span></th>
+														<th class="role-th" scope="col"><i class="fa fa-briefcase" aria-hidden="true"></i> <span>Funktion</span></th>
+														<th class="joint-th" scope="col"><i class="fa fa-chain" aria-hidden="true"></i> <span>gemeinsame Wahl</span></th>
 													</tr>
 												</thead>
 												<!-- step 0 subitem append -->
@@ -199,9 +199,11 @@
 										</td>
 										<td>{{ electionItemType }}</td>
 										<td>
-											<div data-tp-o="3" data-g-tg="elect-joint-{{ itemIndex }}-{{ index }}">
-												<label class="sr-only" for="election-joint-{{ itemIndex }}-{{ index }}" data-g-tg="elect-joint-{{ itemIndex }}-{{ index }}">gemeinsame Wahl</label>
-												<input class="" id="election-joint-{{ itemIndex }}-{{ index }}" type="checkbox">
+											<div class="" data-tp-o="3" data-g-tg="elect-joint-{{ itemIndex }}-{{ index }}">
+												<label class="form-check-label hover-parent d-block" for="election-joint-{{ itemIndex }}-{{ index }}" data-g-tg="elect-joint-{{ itemIndex }}-{{ index }}">
+													<input class="form-check-input" id="election-joint-{{ itemIndex }}-{{ index }}" type="checkbox">
+													<i class="fa fa-chain parent-hover-visible" aria-hidden="true"></i><span class="sr-only">gemeinsame Wahl</span>
+												</label>
 											</div>
 										</td>
 									</tr>
@@ -260,13 +262,13 @@
 									</div>
 									<div class="card-body pt-3 pb-0">
 										
-										<table class="table table-striped table-sm table-responsive-md prepare-election-table">
+										<table class="table table-striped table-sm table-responsive-md election-table prepare-election-table">
 
 											<thead>
 												<tr>
-													<th scope="col"><i class="fa fa-user" aria-hidden="true"></i> <span>Name</span></th>
-													<th scope="col"><i class="fa fa-venus" aria-hidden="true"></i> <span>Frau</span></th>
-													<th scope="col"><i class="fa fa-snowflake-o" aria-hidden="true"></i> <span>Vielfalt</span></th>
+													<th class="name-th" scope="col"><i class="fa fa-user" aria-hidden="true"></i> <span>Name</span></th>
+													<th class="female-th" scope="col"><i class="fa fa-venus" aria-hidden="true"></i> <span>Frau</span></th>
+													<th class="diverse-th" scope="col"><i class="fa fa-snowflake-o" aria-hidden="true"></i> <span>Vielfalt</span></th>
 													<th scope="col"><span class="sr-only">Optionen</span></th>
 												</tr>
 											</thead>
@@ -301,12 +303,16 @@
 											<input class="form-control" id="name-{{ index }}" type="text" placeholder="Name">
 										</td>
 										<td>
-											<label class="sr-only" for="female-{{ index }}">Frau</label>
-											<input class="" id="female-check-{{ index }}" type="checkbox" value="true">
+											<label class="form-check-label hover-parent d-block" for="female-{{ index }}">
+												<input class="form-check-input" id="female-check-{{ index }}" type="checkbox" value="true">
+												<i class="fa fa-venus parent-hover-visible" aria-hidden="true"></i><span class="sr-only">Frau</span>
+											</label>
 										</td>
 										<td>
-											<label class="sr-only" for="diverse-{{ index }}">Vielfalt</label>
-											<input class="" id="diverse-check-{{ index }}" type="checkbox" value="true">
+											<label class="form-check-label hover-parent d-block" for="diverse-{{ index }}">
+												<input class="form-check-input" id="diverse-check-{{ index }}" type="checkbox" value="true">
+												<i class="fa fa-snowflake-o parent-hover-visible" aria-hidden="true"></i><span class="sr-only">Vielfalt</span>
+											</label>
 										</td>
 										<td class="text-right">
 											<button class="btn btn-outline-danger" data-g-fn="election-subitem-remove"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Kandidat*in löschen</span></button>
@@ -371,13 +377,13 @@
 										</div>
 										<div class="card-body pt-3 pb-0">
 											
-											<table class="table table-striped table-sm table-responsive-md execute-election-table">
+											<table class="table table-striped table-sm table-responsive-md election-table execute-election-table">
 
 												<thead>
 													<tr>
-														<th scope="col"><i class="fa fa-user" aria-hidden="true"></i> <span>Name</span></th>
-														<th scope="col"><i class="fa fa-thumbs-up" aria-hidden="true"></i> <span>Ja</span></th>
-														<th scope="col"><i class="fa fa-thumbs-down" aria-hidden="true"></i> <span>Nein</span></th>
+														<th class="name-th" scope="col"><i class="fa fa-user" aria-hidden="true"></i> <span>Name</span></th>
+														<th class="vote-th" scope="col"><i class="fa fa-thumbs-up" aria-hidden="true"></i> <span>Ja</span></th>
+														<th class="vote-th" scope="col"><i class="fa fa-thumbs-down" aria-hidden="true"></i> <span>Nein</span></th>
 													</tr>
 												</thead>
 

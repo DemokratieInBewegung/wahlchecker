@@ -1,12 +1,57 @@
 // dib election tool
 
 
+// check accordion / card
+.check-accordion-header {
+	font-weight: 500;
+
+	label {
+		display: block;
+	}
+}
+
+// card
+.card-header {
+	font-weight: 400;
+}
+
+// hover visible label
+
+.hover-parent .parent-hover-visible {
+	opacity: 0;
+}
+.hover-parent:hover .parent-hover-visible {
+	opacity: 1;
+}
+
+
+
+// table
+.election-table {
+	th {
+		font-weight: 400;
+		color: $dib-color-1;
+	}
+}
+
 .dib-election-tool {
+
+	table td {
+		vertical-align: middle;
+	}
 	
-	// TODO: adapt with to display size & to column content
+	// TODO: adapt width to display size & to column content
+
+	@include media-size(small){
+		.name-th {
+			width: 60%;
+		}
+	}
 	
-	th:not(:nth-child(4)) {
-		width: 33.33333%;
+	@include media-size(large){
+		th:not(:nth-child(4)) {
+			width: 33.33333%;
+		}
 	}
 
 	.add-subitems-count {

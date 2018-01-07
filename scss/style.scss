@@ -42,11 +42,11 @@ $fa-font-path: "../fonts/font-awesome" !default;
 @import "mystyle/search";
 @import "mystyle/sticky-container";
 @import "mystyle/footer";
-@import "mystyle/social-links";
 @import "mystyle/to-top";
 @import "mystyle/breadcrumb";
 
 // dib
+@import "dib/mixins";
 @import "dib/general";
 @import "dib/gradient";
 @import "dib/election-tool";

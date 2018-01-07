@@ -1,0 +1,13 @@
+// media size
+
+
+@mixin media-size($media-size) {
+
+	@if $media-size == small {
+		@media (max-width: #{($dib-media-size-breakpoint - 1)}px) { @content }
+	}
+	@else {
+		@media (min-width: #{$dib-media-size-breakpoint}px) { @content }
+	}
+	
+}

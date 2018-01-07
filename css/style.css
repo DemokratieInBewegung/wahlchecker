@@ -10326,7 +10326,9 @@ body {
 .page-footer {
   margin-top: 2rem;
   padding-bottom: 1.5em;
-  background-color: #fafafa; }
+  background-color: #fafafa;
+  -webkit-box-shadow: 0 2500px 0 2500px #fafafa;
+  box-shadow: 0 2500px 0 2500px #fafafa; }
   .page-footer a[href]:not([class*="color-"]) {
     color: inherit; }
 
@@ -10339,36 +10341,6 @@ body {
   .footer-logo:hover {
     -webkit-filter: grayscale(0%) opacity(100%);
     filter: grayscale(0%) opacity(100%); }
-
-.social-list a[href] {
-  color: #999999;
-  -webkit-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease; }
-
-.color-facebook {
-  color: #3b5998 !important; }
-
-.color-hover-facebook:hover, .color-hover-facebook:focus {
-  color: #3b5998 !important; }
-
-.color-twitter {
-  color: #00aced !important; }
-
-.color-hover-twitter:hover, .color-hover-twitter:focus {
-  color: #00aced !important; }
-
-.color-xing {
-  color: #B0D400 !important; }
-
-.color-hover-xing:hover, .color-hover-xing:focus {
-  color: #B0D400 !important; }
-
-.color-rss {
-  color: #FB9E3A !important; }
-
-.color-hover-rss:hover, .color-hover-rss:focus {
-  color: #FB9E3A !important; }
 
 .to-top-wrapper {
   position: fixed;
@@ -10425,7 +10397,33 @@ body {
   background-image: linear-gradient(to right, #263d82 0%, #293e82 22%, #363f80 33%, #51437d 47%, #784875 63%, #9e4e6b 77%, #c3555f 89%, #e45c4f 100%);
   background-repeat: repeat-y; }
 
-.dib-election-tool th:not(:nth-child(4)) {
-  width: 33.33333%; }
+.check-accordion-header {
+  font-weight: 500; }
+  .check-accordion-header label {
+    display: block; }
+
+.card-header {
+  font-weight: 400; }
+
+.hover-parent .parent-hover-visible {
+  opacity: 0; }
+
+.hover-parent:hover .parent-hover-visible {
+  opacity: 1; }
+
+.election-table th {
+  font-weight: 400;
+  color: #274f9e; }
+
+.dib-election-tool table td {
+  vertical-align: middle; }
+
+@media (max-width: 767px) {
+  .dib-election-tool .name-th {
+    width: 60%; } }
+
+@media (min-width: 768px) {
+  .dib-election-tool th:not(:nth-child(4)) {
+    width: 33.33333%; } }
 
 /*# sourceMappingURL=style.css.map */
