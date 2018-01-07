@@ -1632,7 +1632,9 @@
 						if (
 							typeof currentElectionConfig[ key ][ i ].candidates[ k ].yes !== 'undefined'
 							&& typeof currentElectionConfig[ key ][ i ].candidates[ k ].no !== 'undefined'
+							&& currentElectionConfig[ key ][ i ].candidates[ k ].yes > 0
 						) {
+							// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
 							voteFound = true;
 						}
 						else {
@@ -1687,7 +1689,9 @@
 							if (
 								typeof currentElectionConfig[ key ][ i ].candidates[ j ][ k ].yes !== 'undefined'
 								&& typeof currentElectionConfig[ key ][ i ].candidates[ j ][ k ].no !== 'undefined'
+								&& currentElectionConfig[ key ][ i ].candidates[ j ][ k ].yes > 0
 							) {
+								// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
 								voteFound = true;
 							}
 							else {
