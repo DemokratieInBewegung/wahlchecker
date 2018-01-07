@@ -2150,6 +2150,11 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 						var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 						if ( electionCalculationOutput ) {
 							// copy results into currentElectionConfig
+
+							//TODO (@Felix?): new structure after adding explanation to election result output
+							/*
+								currentElectionConfig[ key ][ i ].results = electionCalculationOutput.candidates;
+							*/
 							currentElectionConfig[ key ][ i ].results = electionCalculationOutput;
 						}
 
@@ -2203,6 +2208,12 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 							var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 							if ( electionCalculationOutput ) {
 								// copy results into currentElectionConfig
+
+								//TODO (@Felix?): new structure after adding explanation to election result output
+								/*
+									currentElectionConfig[ key ][ i ].results.push( electionCalculationOutput.candidates[ 0 ] );
+									electionCalculationInput.previous.push( electionCalculationOutput.candidates[ 0 ] );
+								*/
 								currentElectionConfig[ key ][ i ].results.push( electionCalculationOutput[ 0 ] );
 								electionCalculationInput.previous.push( electionCalculationOutput[ 0 ] );
 							}
@@ -2803,6 +2814,27 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 
         }
 
+        // only calculate election button
+        $CalculateElectionButton = Utils.$functionElems.filter( '[data-fn="calculate-election"]' );
+        $CalculateElectionButton
+        	.off( 'click.calculate' )
+        	.on( 'click.calculate', function( event ) {
+        		event.preventDefault();
+        		
+        		var $form = Utils.$functionElems.filter( stepFormIdentifierPrefix + step + identifierSuffix );
+	        	$form._getElectionCurrentConfig_2();
+
+	        	// get election result
+	        	if ( _getElectionResult() ) {
+
+					//console.log( 'RESULT (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2) );
+	        		
+	        		_buildStep_3();
+	        	}
+				
+        	} )
+        ;
+
         // get config on submit
         $form
         	.off( 'submit.form.' + step )
@@ -3339,13 +3371,6 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 				){
 					console.log( 'increase & check' );
 					// increase item if exists (set to first)
-
-					// FIX?
-					/*if (  ) {
-
-					}
-					_Nav.selectValues = _Nav._getSelectValues( _Nav.$select[ 1 ] );*/
-
 					var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( '-1' ) + 1 ) ];
 					// TODO: calculate disable list
 					var disableOptionsList = ( _Nav.electionDoingSelectValue != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) ? _getDisableOptionsList( [ '-1' ] ) : undefined;
@@ -3355,27 +3380,41 @@ var DIB_ELECTION_CALCULATOR = ( function( $ ) {
 				}
 				else {
 					// set select to current value since markup has been built new
+					console.log( 'adapting value to doing' );
 					var value = _Nav.electionDoingSelectValue;
 					// TODO: calculate disable list
 					var disableOptionsList = ( _Nav.electionDoingSelectValue != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) ? _getDisableOptionsList( [ '-1' ] ) : undefined;
-					if ( ! _increaseSelectValue( value, disableOptionsList ) ) {
+					/*if ( ! _increaseSelectValue( value, disableOptionsList ) ) {
 						return false;
-					}
+					}*/
 					// check for candidates
-					if ( ! _checkForCandidates( value ) ) {
-						console.log( 'candidates missing, go back' );
-						_showMissingCandidatesDialog();
-						_Nav._gotoStep( 1, value );
-						return false;
+					if ( _checkForCandidates( value ) ) {
+						// has candidates
+						_Nav._setItem( value, undefined, disableOptionsList );
+					}
+					else {
+						// TODO: if not first item go to latest valid item
+						console.log( 'candidates missing but not first, goint to latest valid election' );
+						if ( _Nav.selectValues.indexOf( _Nav.electionDoingSelectValue ) - 1 > 0 ) {
+							// is not first item, go one item back
+							var value = _Nav.selectValues[ ( _Nav.selectValues.indexOf( _Nav.electionDoingSelectValue ) - 1 ) ];
+							_Nav.electionDoingSelectValue = value;
+							var disableOptionsList = ( _Nav.electionDoingSelectValue != _Nav.selectValues[ _Nav.selectValues.length - 1 ] ) ? _getDisableOptionsList( [ '-1' ] ) : undefined;
+							_Nav._setItem( value, undefined, disableOptionsList );
+							return true;
+						}
+						else {
+							// is first item, cannot go one item back, going back to step 1
+							_showMissingCandidatesDialog();
+							_Nav._gotoStep( 1, value );
+							return false;
+						}
 					}
 				}
 			}
 			// already in step 2
 			if ( _Nav.previousStep == _Nav.currentStep ) {
 				console.log( _Nav.previousStep + ' == ' + _Nav.currentStep );
-
-				// TODO: disable select 2, allow only 1st .. _Nav.electionDoingSelectValue, disallow -1 until _Nav.electionDoingSelectValue == last item
-
 
 				// increase item if exists
 				if ( _Nav.selectValues.indexOf( _Nav.currentSelectValue[ _Nav.currentStep ] ) + 1 < _Nav.selectValues.length ) {
