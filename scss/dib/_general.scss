@@ -1,2 +1,17 @@
 // dib general
 
+
+.text-strike {
+	text-decoration: line-through;
+}
+
+@include media-breakpoint-up(sm) {
+	.columns-3 {
+		column-count: 3;
+		column-gap: $grid-gutter-width;
+	}
+	.column-block {
+		display: inline-block;
+		width: 100%;
+	}
+}

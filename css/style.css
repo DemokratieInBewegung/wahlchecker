@@ -10390,6 +10390,21 @@ body {
 .breadcrumb-item + .breadcrumb-item::before {
   padding-right: 0; }
 
+.text-strike {
+  text-decoration: line-through; }
+
+@media (min-width: 576px) {
+  .columns-3 {
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+    -webkit-column-gap: 30px;
+    -moz-column-gap: 30px;
+    column-gap: 30px; }
+  .column-block {
+    display: inline-block;
+    width: 100%; } }
+
 .dib-gradient-x {
   background-image: -webkit-gradient(linear, left top, right top, from(#263d82), color-stop(22%, #293e82), color-stop(33%, #363f80), color-stop(47%, #51437d), color-stop(63%, #784875), color-stop(77%, #9e4e6b), color-stop(89%, #c3555f), to(#e45c4f));
   background-image: -webkit-linear-gradient(left, #263d82 0%, #293e82 22%, #363f80 33%, #51437d 47%, #784875 63%, #9e4e6b 77%, #c3555f 89%, #e45c4f 100%);

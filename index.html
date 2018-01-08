@@ -423,7 +423,7 @@
 
 						</section>
 
-						<!-- STEP 3 – ELECTION RESULTS -->
+						<!-- STEP 3 – ELECTION RESULTS + EXPLANATION -->
 
 						<section data-tg="election-step-3" style="display: none;">
 
@@ -432,7 +432,7 @@
 								<h2 class="text-center">4. Wahlergebnis</h2>
 
 								<!-- step 3 item append -->
-								<div data-tg="election-item-append-3">
+								<div class="" data-tg="election-item-append-3">
 								</div>
 
 							</div>
@@ -441,8 +441,7 @@
 							<div style="display: none;" aria-hidden="true">
 
 								<!-- step 3 item template -->
-								<div class="my-3" data-tg="election-item-template-3" style="display: none;">
-
+								<section class="election-item my-3" data-tg="election-item-template-3" style="display: none;">
 
 									<div class="card my-3">
 
@@ -451,28 +450,70 @@
 										</div>
 
 										<!-- step 3 item append -->
-										<div class="card-body pt-3 pb-0" data-g-tg="election-subitemgroup-append-3">
+										<div class="row card-body pt-3 pb-0" data-g-tg="election-subitemgroup-append-3">
 
 										</div>
 
 									</div>
 
-								</div>
+								</section>
 
 								<!-- step 3 subitemgroup template -->
-								<div data-tg="election-subitemgroup-template-3" style="display: none;">
-									<h4>{{ title }}</h4>
+								<section class="col-md-4 election-subitem-group" data-tg="election-subitemgroup-template-3" style="display: none;">
 
-									<!-- step 3 subitemgroup append -->
+									<h4 class="text-center">{{ title }}</h4>
+
+									<hr>
+
+									<!-- step 3 subitem append -->
 									<ol data-g-tg="election-subitem-append-3">
 										<li><span class="text-muted">– noch nicht gewählt –</span></li>
 									</ol>
-								</div>
+
+									<!-- step 3 explanation template append -->
+									<div data-g-tg="explanation-template-append">
+									</div>
+
+								</section>
 
 								<!-- step 3 subitem template -->
-								<li data-tg="election-subitem-template-3" style="display: none;">
+								<li class="election-subitem" data-tg="election-subitem-template-3" style="display: none;">
 									{{ candidateName }}
 								</li>
+
+								<!-- step 3 explanation template -->
+								<section data-tg="explanation-template">
+
+									<div class="card mb-3">
+										<h5 class="card-body py-2 m-0 small text-uppercase text-center">{{ headline }}</h5>
+										<hr class="m-0">
+										<div class="card-body pt-3 pb-0 small" data-g-tg="explanation-item-append">
+										</div>
+									</div>
+
+								</section>
+
+								<!-- step 3 explanation item type text -->
+								<div class="explanation-item" data-tg="explanation-item-text">
+									<h6>{{ itemHeadline }}</h6>
+									<div data-g-tg="explanation-subitem-append">
+									</div>
+								</div>
+
+								<!-- step 3 explanation item type list -->
+								<div class="explanation-item" data-tg="explanation-item-list">
+									<h6>{{ itemHeadline }}</h6>
+									<ul class="mb-2" data-g-tg="explanation-subitem-append">
+									</ul>
+								</div>
+
+								<!-- step 3 explanation subitem type text -->
+								<p class="mb-2" data-tg="explanation-subitem-text">
+									{{ subitemContent }}
+								</p>
+
+								<!-- step 3 explanation subitem type list -->
+								<li data-selected-class="text-strike text-danger" data-tg="explanation-subitem-list">{{ subitemContent }}</li>
 
 							</div>
 							<!-- /step 3 templates -->

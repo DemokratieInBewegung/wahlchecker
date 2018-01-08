@@ -979,13 +979,16 @@
 
 		var $template = $( this );
 
-		for ( var i = 0; i < replaceArr.length; i++ ) {
-        	var replaceString = '{{ ' + replaceArr[ i ][ 0 ] + ' }}';
-        	var regex = new RegExp( replaceString, 'g' );
-			$template.html( $template.html().replace( regex, replaceArr[ i ][ 1 ] ) );
-		}
+		if ( $template.length > 0 ) {
 
-		return $template;
+			for ( var i = 0; i < replaceArr.length; i++ ) {
+	        	var replaceString = '{{ ' + replaceArr[ i ][ 0 ] + ' }}';
+	        	var regex = new RegExp( replaceString, 'g' );
+				$template.html( $template.html().replace( regex, replaceArr[ i ][ 1 ] ) );
+			}
+
+			return $template;
+		}
 
 	}
 
@@ -1926,6 +1929,125 @@
 						}
 						
 	        		}
+
+	        	}
+
+				// explanation
+
+		    	/*
+		    	[data-g-tg="explanation-template-append"]
+				[data-tg="explanation-template"] {{ headline }}
+
+				[data-g-tg="explanation-item-append"] 
+
+				[data-tg="explanation-item-text"] {{ itemHeadline }}
+				[data-g-tg="explanation-subitem-append-text"] 
+				[data-tg="explanation-subitem-text"] {{ subitemContent }}
+
+				[data-tg="explanation-item-list"] {{ itemHeadline }}
+				[data-g-tg="explanation-subitem-append-list"] 
+				[data-tg="explanation-subitem-list">] {{ subitemContent }}
+		    	*/
+		    	if ( 
+	        		typeof currentElectionConfig[ key ][ i ].results !== 'undefined' 
+	        		&& typeof currentElectionConfig[ key ][ i ].results.explanation !== 'undefined' 
+	        		&& currentElectionConfig[ key ][ i ].results.explanation.length > 0 
+	        	) {
+					console.log( 'explanation found' );
+
+					var $explanationTemplate = Utils.$targetElems.filter( '[data-tg="explanation-template"]' );
+					var $explanationTemplateAppend = $subitemgroupClone.find( '[data-g-tg="explanation-template-append"]' );
+					
+					//
+
+					//var $explanationTypeTextItem = Utils.$targetElems.filter( '[data-g-tg="explanation-item-text"]' );
+					var $explanationTypeTextSubitem = Utils.$targetElems.filter( '[data-g-tg="explanation-subitem-text"]' );
+					//var $explanationTypeTextSubitemAppend = $subitemgroupClone.find( '[data-g-tg="explanation-subitem-text"]' );
+					
+					//var $explanationTypeListItem = Utils.$targetElems.filter( '[data-g-tg="explanation-item-list"]' );
+					var $explanationTypeListSubitem = Utils.$targetElems.filter( '[data-g-tg="explanation-subitem-list"]' );
+					//var $explanationTypeListSubitemAppend = $subitemgroupClone.find( '[data-g-tg="explanation-subitem-list"]' );
+					
+					var explanation = currentElectionConfig[ key ][ i ].results.explanation;
+
+					for ( var j = 0; j < explanation.length; j++ ) {
+
+						console.log( 'explanation j: ' + j );
+
+						// clone
+						var $explanationClone = $explanationTemplate.clone();
+
+						// set content
+						$explanationClone
+			    			._replaceTemplatePlaceholders( [ 
+			    				[ 'headline', explanation[ j ].headline ]
+			    			] )
+			    			.removeAttr( 'style data-tg' )
+			    			.show()
+			    		;
+
+			    		var $explanationItemAppend = $explanationClone.find( '[data-g-tg="explanation-item-append"]' );
+
+			    		// items
+			    		for ( var k = 0; k < explanation[ j ].content.length; k++ ) {
+
+							console.log( 'explanation[' + j + '] k: ' + k );
+							
+			    			var item = explanation[ j ].content[ k ];
+
+			    			// clone item
+			    			var $explanationItemClone = Utils.$targetElems.filter( '[data-tg="explanation-item-' + item.type + '"]' ).clone();
+
+			    			// set content
+			    			$explanationItemClone
+				    			._replaceTemplatePlaceholders( [ 
+				    				[ 'itemHeadline', item.headline ]
+				    			] )
+				    			.removeAttr( 'style data-tg' )
+				    			.show()
+			    			;
+
+			    			var $explanationSubitemAppend = $explanationItemClone.find( '[data-g-tg="explanation-subitem-append"]' );
+							
+							// subitems
+			    			var subitem = item.items;
+			    			for ( var l = 0; l < subitem.length; l++ ) {
+
+								console.log( 'subitem[' + l + '].item: ' + subitem[ l ].item );
+
+			    				// clone subitem
+								var $explanationSubitemClone = Utils.$targetElems.filter( '[data-tg="explanation-subitem-' + item.type + '"]' ).clone();
+
+								// set content
+								$explanationSubitemClone
+					    			._replaceTemplatePlaceholders( [ 
+					    				[ 'subitemContent', subitem[ l ].item ]
+					    			] )
+					    			.removeAttr( 'style data-tg' )
+					    			.show()
+				    			;
+
+				    			// manipulate
+				    			if ( ! subitem[ l ].selected ) {
+				    				// add class if selected
+				    				var addClass = $explanationSubitemClone.attr( 'data-selected-class' );
+				    				$explanationSubitemClone.addClass( addClass );
+				    			}
+
+				    			// append
+				    			$explanationSubitemClone.appendTo( $explanationSubitemAppend );
+
+			    			}
+
+			    			// append item
+			    			$explanationItemClone.appendTo( $explanationItemAppend );
+
+			    		}
+
+			    		// append explanation
+			    		$explanationClone.appendTo( $explanationTemplateAppend );
+
+					}
 
 	        	}
 

@@ -300,10 +300,10 @@ output = {
                 ],
                 "explanation": [
                     {
-                        "headline": "Vielfaltsquote erfüllen",
+                        "headline": "Erklärung",
                         "content": [
                             {
-                                "headline": "",
+                                "headline": "Vielfaltsquote erfüllen",
                                 "type": "text",
                                 "items": [
                                     {
