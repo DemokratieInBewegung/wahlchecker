@@ -2243,9 +2243,13 @@ output = {
 					else {
 						// all following elections if results copy into previous
 						var previousI = i - 1;
-						if ( typeof currentElectionConfig[ key ][ previousI ].results !== 'undefined' && currentElectionConfig[ key ][ previousI ].results.length > 0 ) {
-							for ( var k = 0; k < currentElectionConfig[ key ][ previousI ].results.length; k++ ) {
-								electionCalculationInput.previous.push( currentElectionConfig[ key ][ previousI ].results[ k ] );
+						if ( 
+							typeof currentElectionConfig[ key ][ previousI ].results !== 'undefined' 
+							&& typeof currentElectionConfig[ key ][ previousI ].results.candidates !== 'undefined'
+							&& currentElectionConfig[ key ][ previousI ].results.candidates.length > 0 
+						) {
+							for ( var k = 0; k < currentElectionConfig[ key ][ previousI ].results.candidates.length; k++ ) {
+								electionCalculationInput.previous.push( currentElectionConfig[ key ][ previousI ].results.candidates[ k ] );
 							}
 						}
 					}
@@ -2342,7 +2346,10 @@ output = {
 							electionCalculationInput.current = [ currentElectionConfig[ key ][ i ].name, j ];
 							// if still no results define results
 							if ( j === 0 ) {
-								currentElectionConfig[ key ][ i ].results = [];
+								currentElectionConfig[ key ][ i ].results = {
+									"candidates": [],
+									"explanation": []
+								};
 							}
 							electionCalculationInput.candidates = currentElectionConfig[ key ][ i ].candidates[ j ];
 
