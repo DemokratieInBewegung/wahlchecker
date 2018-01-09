@@ -2030,7 +2030,10 @@ output = {
 
     		$subitemClone
     			._replaceTemplatePlaceholders( [ 
-    				[ 'index', currentIndex ] 
+    				[ 'index', currentIndex ], 
+    				[ 'itemIndex', electionGroupIndex ],
+    				[ 'subitemgroupIndex', electionIndex ], 
+    				[ 'subitemIndex', ( ( typeof singleElectionIndex !== 'undefined' ) ? singleElectionIndex + '-' + currentIndex : currentIndex ) ] 
     			] )
     			.removeAttr( 'style data-tg' )
     			.attr( subitemIdentifierAttr, subitemIdentifierAttrVal )
@@ -2975,8 +2978,7 @@ output = {
 		    			.attr( itemIdentifierAttr, itemIdentifierAttrVal )
 		    			.attr( itemIdAttr, ( typeof j !== 'undefined' ) ? itemIndex + inputIdentifierSeparator + i + inputIdentifierSeparator + j : itemIndex + inputIdentifierSeparator + i )
 						._replaceTemplatePlaceholders( [ 
-							[ 'title', title ], 
-							[ 'index', itemIndex ] 
+							[ 'title', title ] 
 						] )
 					;
 
@@ -3006,8 +3008,12 @@ output = {
 			    		$subitemClone
 			    			._replaceTemplatePlaceholders( [ 
 			    				[ 'index', subitemsCount ],
-			    				[ 'candidateName', candidateName ]
-			    			] )
+			    				[ 'candidateName', candidateName ], 
+								[ 'index', itemIndex ],
+			    				[ 'itemIndex', itemIndex ],
+			    				[ 'subitemgroupIndex', i ], 
+			    				[ 'subitemIndex', ( ( typeof j !== 'undefined' ) ? j + '-' + l : l ) ]
+				    			] )
 			    			.removeAttr( 'style data-tg' )
 			    			.attr( subitemIdentifierAttr, subitemIdentifierAttrVal )
 			    			.attr( subitemIdAttr, l )

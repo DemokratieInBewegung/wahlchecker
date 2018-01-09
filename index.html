@@ -299,25 +299,25 @@
 								<tbody>
 									<tr style="display: none;" data-tg="election-subitem-template-1">
 										<td>
-											<label class="sr-only" for="name-{{ index }}">Name</label>
-											<input class="form-control" id="name-{{ index }}" type="text" placeholder="Name">
+											<label class="sr-only" for="name-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}">Name</label>
+											<input class="form-control" id="name-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}" type="text" placeholder="Name">
 										</td>
 										<td>
 											<label class="form-check-label hover-parent d-block">
-												<input class="form-check-input" type="checkbox" value="true">
+												<input class="form-check-input" id="female-check-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}" type="checkbox" value="true">
 												<i class="fa fa-venus parent-hover-visible" aria-hidden="true"></i><span class="sr-only">Frau</span>
 											</label>
 										</td>
 										<td>
 											<label class="form-check-label hover-parent d-block">
-												<input class="form-check-input" type="checkbox" value="true">
+												<input class="form-check-input" id="diverse-check-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}" type="checkbox" value="true">
 												<i class="fa fa-snowflake-o parent-hover-visible" aria-hidden="true"></i><span class="sr-only">Vielfalt</span>
 											</label>
 										</td>
 										<td class="text-right">
 											<button class="btn btn-outline-danger" data-g-fn="election-subitem-remove"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Kandidat*in löschen</span></button>
-											<input type="hidden" id="votes-yes-{{ index }}">
-											<input type="hidden" id="votes-no-{{ index }}">
+											<input type="hidden" id="votes-yes-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}">
+											<input type="hidden" id="votes-no-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}">
 										</td>
 									</tr>
 								</tbody>
@@ -407,12 +407,12 @@
 												{{ candidateName }}
 											</td>
 											<td>
-												<label class="sr-only" for="name-{{ index }}">Ja</label>
-												<input class="form-control" id="votes-yes-{{ index }}" type="number" min="0" placeholder="Ja" data-g-fn="validate">
+												<label class="sr-only" for="name-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}">Ja</label>
+												<input class="form-control" id="votes-yes-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}" type="number" min="0" placeholder="Ja" data-g-fn="validate">
 											</td>
 											<td>
-												<label class="sr-only" for="name-{{ index }}">Nein</label>
-												<input class="form-control" id="votes-no-{{ index }}" type="number" min="0" placeholder="Nein" data-g-fn="validate">
+												<label class="sr-only" for="name-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}">Nein</label>
+												<input class="form-control" id="votes-no-{{ itemIndex }}-{{ subitemgroupIndex }}-{{ subitemIndex }}" type="number" min="0" placeholder="Nein" data-g-fn="validate">
 											</td>
 										</tr>
 									</tbody>
