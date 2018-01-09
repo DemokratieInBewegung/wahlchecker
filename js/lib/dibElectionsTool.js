@@ -906,6 +906,7 @@
 
 	var inputIdentifierSeparator = '_';
 	var formIdentifierAttr = 'name';
+	var idSeparator = '-';
 
 	// items
 	itemInputs[ 0 ] = {
@@ -1177,10 +1178,9 @@
 
     		$subitemClone
     			._replaceTemplatePlaceholders( [ 
-    				[ 'index', currentIndex ], 
     				[ 'itemIndex', electionGroupIndex ],
     				[ 'subitemgroupIndex', electionIndex ], 
-    				[ 'subitemIndex', ( ( typeof singleElectionIndex !== 'undefined' ) ? singleElectionIndex + '-' + currentIndex : currentIndex ) ] 
+    				[ 'subitemIndex', ( ( typeof singleElectionIndex !== 'undefined' ) ? singleElectionIndex + idSeparator + currentIndex : currentIndex ) ] 
     			] )
     			.removeAttr( 'style data-tg' )
     			.attr( subitemIdentifierAttr, subitemIdentifierAttrVal )
@@ -1421,10 +1421,17 @@
 						if (
 							typeof currentElectionConfig[ key ][ i ].candidates[ k ].yes !== 'undefined'
 							&& typeof currentElectionConfig[ key ][ i ].candidates[ k ].no !== 'undefined'
-							&& currentElectionConfig[ key ][ i ].candidates[ k ].yes > 0
 						) {
-							// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
-							voteFound = true;
+							if ( 
+								currentElectionConfig[ key ][ i ].candidates[ k ].yes != '0'
+								|| currentElectionConfig[ key ][ i ].candidates[ k ].no != '0' ) {
+								// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
+								voteFound = true;
+								//console.log( '    VOTE FOUND' );
+							}
+							else {
+								//console.log( '    NO VOTE FOUND' );
+							}
 						}
 						else {
 							missingVoteFound = true;
@@ -1444,6 +1451,7 @@
 
 						// call election tool
 						var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
+						// TODO: handle errors
 						if ( electionCalculationOutput ) {
 							// copy results into currentElectionConfig
 							currentElectionConfig[ key ][ i ].results = electionCalculationOutput;
@@ -1473,10 +1481,14 @@
 							if (
 								typeof currentElectionConfig[ key ][ i ].candidates[ j ][ k ].yes !== 'undefined'
 								&& typeof currentElectionConfig[ key ][ i ].candidates[ j ][ k ].no !== 'undefined'
-								&& currentElectionConfig[ key ][ i ].candidates[ j ][ k ].yes > 0
 							) {
-								// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
-								voteFound = true;
+								if ( 
+									currentElectionConfig[ key ][ i ].candidates[ j ][ k ].yes != '0'
+									|| currentElectionConfig[ key ][ i ].candidates[ j ][ k ].no != '0' 
+								) {
+									// vote exists, minimum one yes vote is > 0 (since ui saves '0' if not filled)
+									voteFound = true;
+								}
 							}
 							else {
 								missingVoteFound = true;
@@ -1502,6 +1514,7 @@
 
 							// call election tool
 							var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
+							// TODO: handle errors
 							if ( electionCalculationOutput ) {
 								// copy results into currentElectionConfig
 								currentElectionConfig[ key ][ i ].results.candidates.push( electionCalculationOutput.candidates[ 0 ] );
@@ -2161,12 +2174,10 @@
 
 			    		$subitemClone
 			    			._replaceTemplatePlaceholders( [ 
-			    				[ 'index', subitemsCount ],
-			    				[ 'candidateName', candidateName ], 
-								[ 'index', itemIndex ],
+			    				[ 'candidateName', candidateName ],
 			    				[ 'itemIndex', itemIndex ],
 			    				[ 'subitemgroupIndex', i ], 
-			    				[ 'subitemIndex', ( ( typeof j !== 'undefined' ) ? j + '-' + l : l ) ]
+			    				[ 'subitemIndex', ( ( typeof j !== 'undefined' ) ? j + idSeparator + l : l ) ]
 				    			] )
 			    			.removeAttr( 'style data-tg' )
 			    			.attr( subitemIdentifierAttr, subitemIdentifierAttrVal )
