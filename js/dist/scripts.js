@@ -2351,6 +2351,8 @@ output = {
 
 	_getElectionResult = function() {
 
+		var hasError = false;
+
 		// election groups
 		for ( var key in currentElectionConfig ) {
 
@@ -2449,8 +2451,18 @@ output = {
 
 						// call election tool
 						var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
-						// TODO: handle errors
-						if ( electionCalculationOutput ) {
+						
+						// handle errors
+						// TEST <<<<<<<<<<<<<
+						if ( true || typeof electionCalculationOutput.error !== 'undefined' ) {
+							// has error
+							hasError = true;
+							// TEST <<<<<<<<<<<<<
+							//_handleError( electionCalculationOutput.error );
+							_handleError( { "message": 'Dies ist nur ein Testfehler.' } );
+							return false;
+						}
+						else {
 							// copy results into currentElectionConfig
 							currentElectionConfig[ key ][ i ].results = electionCalculationOutput;
 						}
@@ -2512,8 +2524,14 @@ output = {
 
 							// call election tool
 							var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
-							// TODO: handle errors
-							if ( electionCalculationOutput ) {
+							
+							// handle errors
+							if ( typeof electionCalculationOutput.error !== 'undefined' ) {
+								// has error
+								hasError = true;
+								_handleError( electionCalculationOutput.error );
+							}
+							else {
 								// copy results into currentElectionConfig
 								currentElectionConfig[ key ][ i ].results.candidates.push( electionCalculationOutput.candidates[ 0 ] );
 								electionCalculationInput.previous.push( electionCalculationOutput.candidates[ 0 ] );
@@ -2534,7 +2552,7 @@ output = {
 		}
 
 		// if election result return true
-		return ( electionCalculationOutput ) ? true : false;
+		return ! hasError;
 	}
 
 	// get config step 0
@@ -3275,9 +3293,10 @@ output = {
 					//console.log( 'RESULT (currentElectionConfig): ' + JSON.stringify( currentElectionConfig, null, 2) );
 	        		
 	        		_buildStep_3();
-	        	}
 
-	        	$form.trigger( 'built' );
+	        		$form.trigger( 'built' );
+
+	        	}
 
 	        } )
 	    ;
@@ -4201,17 +4220,7 @@ output = {
 			event.preventDefault();
 
 			if ( typeof result !== 'undefined' ) {
-				/*
-				// set both
-				currentElectionPreset = $.extend( {}, result );
-				currentElectionConfig = $.extend( {}, result );
 
-				_buildStep_0();
-				_Nav._reset();
-
-		    	// hide results container
-		    	Utils.$targetElems.filter( stepIdentifierPrefix + 3 + identifierSuffix ).hide();
-		    	*/
 		    	_resetElection( result );
 
 				Utils.$targetElems.filter( '[data-tg="load-modal"]' ).modal( 'hide' );
@@ -4317,6 +4326,30 @@ output = {
 			}
 		} );
 	} );
+
+	// ERRORS
+	function _handleError( error ) {
+
+		// fallback message
+		var message = 'Bei der Berechnung des Wahlergebnisses ist leider ein unbekannter Fehler aufgetreten.';
+
+		// get error message
+		if ( typeof error.message ) {
+			message = error.message;
+		}
+
+		// show modal
+		var $confirmModal = Utils.$targetElems.filter( '[data-tg="confirm-modal"]' );
+		$confirmModal._confirmModal( {
+			header: 'Fehler',
+			headerClass: 'modal-title text-warning',
+			body: message,
+			confirmButtonHide: true,
+			dismissButtonClass: 'btn btn-primary btn-warning',
+			dismissButtonIconClass: 'fa fa-check',
+			dismissButtonText: 'Ok'
+		} );
+	}
 
 	// SECURITY
 
