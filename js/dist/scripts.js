@@ -2453,13 +2453,10 @@ output = {
 						var electionCalculationOutput = DibElectionCalculator.getResult( electionCalculationInput );
 						
 						// handle errors
-						// TEST <<<<<<<<<<<<<
-						if ( true || typeof electionCalculationOutput.error !== 'undefined' ) {
+						if ( typeof electionCalculationOutput.error !== 'undefined' ) {
 							// has error
 							hasError = true;
-							// TEST <<<<<<<<<<<<<
-							//_handleError( electionCalculationOutput.error );
-							_handleError( { "message": 'Dies ist nur ein Testfehler.' } );
+							_handleError( electionCalculationOutput.error );
 							return false;
 						}
 						else {
@@ -4208,7 +4205,8 @@ output = {
 							result = JSON.parse( event.target.result );
 						} 
 						catch( error ) {
-							console.log( 'error trying to parse json: ' + error );
+							_handleError( { "message": 'error trying to parse json: ' + error } );
+							//console.log( 'error trying to parse json: ' + error );
 						}
 					}
 				} )( files[ 0 ] );
