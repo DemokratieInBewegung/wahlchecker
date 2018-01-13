@@ -276,7 +276,7 @@ output = {
 */
 
             function error (message) {
-                return {error: message};
+                return {error: {text: message}};
             }
 
             function stringify (object) {
