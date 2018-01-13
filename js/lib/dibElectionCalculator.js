@@ -328,9 +328,7 @@ output = {
                 return 0;
             }
             
-            candidates.sort (function (a,b) {
-                return lexicalOrderArrayComparison (a.priority,b.priority);
-            });
+            candidates.sort ((a,b) => lexicalOrderArrayComparison (a.priority,b.priority));
 
             // remove temporary entries used only for sorting
             for (var candidate of candidates)
