@@ -588,6 +588,7 @@ output = {
                                 else {
                                 	addStatement ("Es kann keine Ersetzung zur Erfüllung der Frauenquote vorgenommen werden, ohne die Vielfaltsquote zu verletzen.")
                                     log ("cannot make a replacement without violating diversity quota -- women's quota can't be fulfilled");
+                                	break;
                                 }
                             }
 
