@@ -275,6 +275,51 @@ output = {
 }
 */
 
+        	var explanation = [];
+            var currentExplanationItem;
+
+            function startExplanationItem (headline) {
+            	currentExplanationItem = {
+            			headline: headline,
+            			content: []
+            	}
+            	explanation.push (currentExplanationItem);
+            }
+            
+            // describe a given candidate by name and group membership
+            function candidateDescription (candidate) {
+                var result = candidate.name;
+                if (candidate.female)
+                    result += " (f)";
+                if (candidate.diverse)
+                    result += " (v)";
+                return result;
+            }
+            
+            function addCandidateList (headline,allSelected = false) {
+            	var contentEntry = {
+            			headline: headline,
+            			type: "list",
+            			items: []
+            	};
+            	
+            	for (var candidate of candidates)
+            		contentEntry.items.push ({
+            			item: candidateDescription (candidate.candidate),
+            			selected: candidate.selected | allSelected
+            		});
+
+            	currentExplanationItem.content.push (contentEntry);
+            }
+            
+            function addStatement (statement,headline = "") {
+            	currentExplanationItem.content.push ({
+            		headline: headline,
+            		type: "text",
+            		items: [{item: statement}]
+            	});
+            }
+             
             function error (message) {
                 return {error: {text: message}};
             }
@@ -293,8 +338,6 @@ output = {
             log (stringify (input));
             log ("***********");
 
-            var explanation = [];
-
             // find the current election in the election structure array
             var current = 0;
             while (current < input.structure.length && input.structure [current].name != input.current)
@@ -310,7 +353,7 @@ output = {
 
             // determine the successful candidates in the sense of §10
             var candidates = input.candidates.filter (candidate => Number (candidate.yes) > Number (candidate.no));
-            
+
             // sort the candidates in lexical order by yes votes, then yes minus no votes, then a random number to resolve ties 
             // TODO: ensure consistency of random lots across repeated evaluations
             for (var candidate of candidates)
@@ -335,73 +378,90 @@ output = {
                 delete candidate.priority;
 
             log ("successful candidates: " + stringify (candidates));
-
-            var reverseCandidates = candidates.slice ().reverse ();
-
-            // determine the quotas (§6 (2))
-
-            // determine the count from which the quota are calculated
-            // if the quotas refer only to these offices, the count is the number of offices being elected
-            var count = structure.count;
             
-            // if the quotas refer to a body overall (§5 (4)) the count is the number of offices being elected plus the number of offices previously elected in the same body 
-            if (structure.overall)
-                count += input.previous.length;
-            
-            var quotas = {
-                    "female" : count == 1 ? 0 : (count + 1) >> 1, // at least 50%, but no quota is applied to single offices
-                    "diverse" : (count + 1) >> 2                  // equivalent to §5 (3) WO : 1 for 3, 2 for 7, ...
-            };
-            
-            log ("quotas: " + stringify (quotas));
-
-         // if the quotas refer to a body overall, reduce them according to the previously elected candidates
-            if (structure.overall) {
-                for (var group of ["female","diverse"])
-                    for (var previousCandidate of input.previous)
-                        if (previousCandidate.candidate [group])
-                            quotas [group]--;
-                log ("remaining quotas in overall election: " + stringify (quotas));
-            }
-
-            // limit the quotas to the number of offices being elected
-            for (var group in quotas)
-                if (quotas [group] > count) {
-                    log ("more reservations for " + group + " candidates than offices");
-                    quotas [group] = count;
-                }
+            startExplanationItem ("Erfolgreiche Kandidierende");
+            addCandidateList ("Die erforderliche Mehrheit nach §10 haben erreicht, in Reihenfolge nach §11:",true);
 
             // initially, the top candidates are selected, §6 (4)
             for (var i = 0;i < structure.count && i < candidates.length;i++)
                 candidates [i].selected = true;
-            
-            // number of selected candidates of a given group
-            function countGroup (group) {
-                return candidates.filter (candidate => candidate.selected && candidate.candidate [group]).length;
-            };
-            
-            // is the quota fulfilled for a given group?
-            function isRepresented (group) {
-                return countGroup (group) >= quotas [group];
-            };
 
             // not more successful candidates than offices -- they're all elected 
             if (candidates.length <= structure.count) {
                 // TODO: announce (non)fulfilment of diversity quota
                 log ((candidates.length == structure.count ? "as many successful candidates as" : "fewer successful candidates than") + " offices -- all successful candidates have been elected");
+                addStatement ("Es gibt " + (candidates.length == structure.count ? "ebenso viele erfolgreiche Kandidierende wie" : "weniger erfolgreiche Kandidierende als") + " zu vergebende Ämter; daher sind alle erfolgreichen Kandidierenden gewählt.");
             }
             // more successful candidates than offices -- try to fulfill the quotas
             else {
-                // describe a given candidate by name and group membership
-                function candidateDescription (candidate) {
-                    var result = candidate.name;
-                    if (candidate.female)
-                        result += " (f)";
-                    if (candidate.diverse)
-                        result += " (v)";
-                    return result;
+                var reverseCandidates = candidates.slice ().reverse ();
+
+                // determine the quotas (§6 (2))
+
+                startExplanationItem ("Zu reservierende Ämter");
+
+                // determine the count from which the quota are calculated
+                // if the quotas refer only to these offices, the count is the number of offices being elected
+                var count = structure.count;
+                
+                // if the quotas refer to a body overall (§5 (4)) the count is the number of offices being elected plus the number of offices previously elected in the same body 
+                if (structure.overall)
+                    count += input.previous.length;
+                
+                var quotas = {
+                        "female" : count == 1 ? 0 : (count + 1) >> 1, // at least 50%, but no quota is applied to single offices
+                        "diverse" : (count + 1) >> 2                  // equivalent to §5 (3) WO : 1 for 3, 2 for 7, ...
+                };
+                
+                log ("quotas: " + stringify (quotas));
+
+                function addQuotaStatement (prefix,singular,plural) {
+                	var quotaStatement = prefix;
+                	quotaStatement += ' ';
+                	quotaStatement += (quotas.female + quotas.diverse == 1) ? singular : plural;
+                	if (quotas.female)
+                		quotaStatement += ' ' + quotas.female + ' ' + (quotas.female > 1 ? "Ämter" : "Amt") + " für Frauen";
+                	if (quotas.female && quotas.diverse)
+                		quotaStatement += " und";
+                	if (quotas.diverse)
+                		quotaStatement += ' ' + quotas.diverse + ' ' + (quotas.diverse > 1 ? "Ämter" : "Amt") + " für Vielfalt";
+                	if (!(quotas.female || quotas.diverse))
+                		quotaStatement += " keine Ämter";
+            		quotaStatement += " zu reservieren.";
+            		addStatement (quotaStatement);
                 }
                 
+             // if the quotas refer to a body overall, reduce them according to the previously elected candidates
+                if (structure.overall) {
+                	addQuotaStatement ("Im Gremium insgesamt","ist","sind");
+                    for (var group of ["female","diverse"])
+                        for (var previousCandidate of input.previous)
+                            if (previousCandidate.candidate [group] && quotas [group])
+                            	quotas [group]--;
+                    log ("remaining quotas in overall election: " + stringify (quotas));
+                	addQuotaStatement ("Davon","verbleibt","verbleiben");
+                }
+                else
+                	addQuotaStatement ("Es","ist","sind");
+
+                // limit the quotas to the number of offices being elected
+                for (var group in quotas)
+                    if (quotas [group] > count) {
+                        log ("more reservations for " + group + " candidates than offices");
+                        // TODO Erklärung hinzufügen
+                        quotas [group] = count;
+                    }
+
+                // number of selected candidates of a given group
+                function countGroup (group) {
+                    return candidates.filter (candidate => candidate.selected && candidate.candidate [group]).length;
+                };
+                
+                // is the quota fulfilled for a given group?
+                function isRepresented (group) {
+                    return countGroup (group) >= quotas [group];
+                };
+
                 function printSeparator () {
                     log ("------------------------------------------------------------------");
                 }
@@ -411,10 +471,6 @@ output = {
                         log ((candidate.selected ? "** " : "   ") + candidateDescription (candidate.candidate));
                     printSeparator ();
                 }
-                
-                log ("initial selection:");
-                
-                printCandidates ();
                 
                 // find the first candidate who is not selected and fulfils a given condition
                 function findFirstNonSelected (condition) {
@@ -437,21 +493,33 @@ output = {
                 };
                 
                 // replace one given candidate by another in the selection
-                function replace (replacing,replaced) {
+                function replace (replacing,replaced,quota = null) {
                     log ("replacing " + replaced.candidate.name + " by " + replacing.candidate.name);
+                    if (quota)
+                    	addStatement ("Zur Erfüllung der " + quota + "quote wird " + replaced.candidate.name + " in der Auswahl durch " + replacing.candidate.name + " ersetzt:");
     
                     replacing.selected = true;
                     replaced.selected = false;
+                    addCandidateList ("");
                 }
 
+                startExplanationItem ("Anwendung der Quotierungsregeln");
+                addCandidateList ("Ursprüngliche Auswahl vor Anwendung der Quotierungsregeln");
+                
+                log ("initial selection:");
+                
+                printCandidates ();
+                
                 // fulfil the diversity quota (§6 (5))
                 if (quotas.diverse) {
+                	addStatement ("Erfüllung der Vielfaltsquote:");
                     log ("ensuring diversity quota");
                     printSeparator ();
 
                     while (!isRepresented ("diverse")) {
                         var replacing = findFirstNonSelectedMember ("diverse");
                         if (!replacing) {
+                        	addStatement ("Es gibt nicht genügend erfolgreiche Kandidierende mit Vielfalt, um die Vielfaltsquote zu erfüllen.");
                             log ("not enough successful candidates to fulfil diversity quota");
                             break;
                         }
@@ -459,13 +527,14 @@ output = {
                         var replaced = findLastSelectedNonMember ("diverse");
                         if (!replaced)
                             return error ("more reservations for diversity than offices");
-        
-                        replace (replacing,replaced);
+
+                        replace (replacing,replaced,"Vielfalts");
                         printCandidates ();
                     }
 
                     var diversityQuotaFulfilled = isRepresented ("diverse");
                     log (diversityQuotaFulfilled ? "diversity quota fulfilled" : "diversity quota not fulfilled");
+                    addStatement ("Die Vielfaltsquote ist " + (diversityQuotaFulfilled ? "" : "nicht ") + "erfüllt.");
                     printCandidates ();
         
                     // if the diversity quota can't be fulfilled, adjust it to the number of successful diverse candidates  
@@ -478,6 +547,7 @@ output = {
                 // fulfil the women's quota (§6 (6))
     
                 if (quotas.female) {
+                	addStatement ("Erfüllung der Frauenquote:");
                     log ("ensuring women's quota");
                     printSeparator ();
                     while (!isRepresented ("female")) {
@@ -492,11 +562,12 @@ output = {
                         if (!replaced)
                             throw new Error ("more reservations for women than offices");
 
-                        replace (replacing,replaced);
+                        replace (replacing,replaced,"Frauen");
 
                         // now check if the replacement violated the diversity quota 
                         if (!isRepresented ("diverse")) {
                             log ("replacement violated diversity quota -- undoing");
+                        	addStatement ("Die Ersetzung würde die Vielfaltsquote erfüllen und wird deshalb rückgängig gemacht:");
                             replace (replaced,replacing); // undo replace
 
                             // standard replacement violated diversity quota
@@ -514,20 +585,26 @@ output = {
                                 if (replacingDiverse)
                                     // a diverse candidate who can replace was found
                                     replacing = replacingDiverse;
-                                else
+                                else {
+                                	addStatement ("Es kann keine Ersetzung zur Erfüllung der Frauenquote vorgenommen werden, ohne die Vielfaltsquote zu verletzen.")
                                     log ("cannot make a replacement without violating diversity quota -- women's quota can't be fulfilled");
+                                }
                             }
 
-                            replace (replacing,replaced);
+                            replace (replacing,replaced,"Frauen");
                         }           
 
                         printCandidates ();
                     }
-                    log (isRepresented ("female") ? "women's quota fulfilled" : "women's quota not fulfilled");
+                    var womensQuotaFulfilled = isRepresented ("female");
+                    log (womensQuotaFulfilled ? "women's quota fulfilled" : "women's quota not fulfilled");
+                    addStatement ("Die Frauenquote ist " + (womensQuotaFulfilled ? "" : "nicht ") + "erfüllt.");
                     printSeparator ();
                 }
                 else
                     log ("no women's quota applies");
+                
+                addCandidateList ("Ergebnis nach Anwendung der Quotierungsregeln:");
             }
             
             log ("Final selection:");
@@ -536,7 +613,8 @@ output = {
                 log (selectedCandidate.candidate.name);
 
             var output = {};
-            // outpupt.explanation = explanation; 
+
+            output.explanation = explanation; 
             // Kann mir jemand erklären, warum das nicht funktioniert, wenn ich stattdessen "map (candidate => {candidate: candidate.candidate})" schreibe?
             output.candidates = candidates.filter (candidate => candidate.selected).map (function (candidate) { return {candidate: candidate.candidate}});        
 
