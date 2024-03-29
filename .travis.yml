@@ -1,7 +1,7 @@
 dist: jammy
 sudo: false
 addons:
-  ssh_known_hosts: iris.bewegung.jetzt
+  ssh_known_hosts: iris.dib.de
 
 script:
 - echo "done"
@@ -17,7 +17,7 @@ deploy:
   provider: script
   skip_cleanup: true
   script: "rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR/ 
-root@iris.bewegung.jetzt:/var/dib/wahlchecker/site"
+root@iris.dib.de:/var/dib/wahlchecker/site"
   on:
     branch: master
     condition: '"$TRAVIS_PULL_REQUEST" = "false"'
