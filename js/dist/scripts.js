@@ -793,7 +793,7 @@ output = {
                         // now check if the replacement violated the diversity quota 
                         if (!isRepresented ("diverse")) {
                             log ("replacement violated diversity quota -- undoing");
-                        	addStatement ("Die Ersetzung würde die Vielfaltsquote erfüllen und wird deshalb rückgängig gemacht:");
+                        	addStatement ("Die Ersetzung würde die Vielfaltsquote verletzen und wird deshalb rückgängig gemacht:");
                             replace (replaced,replacing); // undo replace
 
                             // standard replacement violated diversity quota
